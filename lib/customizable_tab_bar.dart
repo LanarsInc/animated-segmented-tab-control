@@ -20,14 +20,12 @@ class CustomizableTabBar extends StatefulWidget implements PreferredSizeWidget {
     this.indicatorColor,
     this.squeezeIntensity = 1,
     this.squeezeDuration = const Duration(milliseconds: 500),
-    this.squeezeCurve = Curves.decelerate,
     this.indicatorPadding = EdgeInsets.zero,
     this.tabPadding = const EdgeInsets.symmetric(horizontal: 8),
     this.radius = const Radius.circular(20),
     this.splashColor,
     this.splashHighlightColor,
-  })  : borderRadius = const BorderRadius.all(Radius.circular(20)),
-        super(key: key);
+  }) : super(key: key);
 
   final double height;
   final List<CustomizableTab> tabs;
@@ -39,10 +37,8 @@ class CustomizableTabBar extends StatefulWidget implements PreferredSizeWidget {
   final Color? indicatorColor;
   final double squeezeIntensity;
   final Duration squeezeDuration;
-  final Curve squeezeCurve;
   final EdgeInsets indicatorPadding;
   final EdgeInsets tabPadding;
-  final BorderRadius borderRadius;
   final Radius radius;
   final Color? splashColor;
   final Color? splashHighlightColor;
@@ -133,12 +129,12 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
   }
 
   void _updateControllerIndex() {
-    _controller!.index = _alignmentToIndex(_currentIndicatorAlignment);
+    _controller!.index = _internalIndex;
   }
 
   TickerFuture _animateIndicatorToNearest(
       Offset pixelsPerSecond, double width) {
-    final nearest = _alignmentToIndex(_currentIndicatorAlignment);
+    final nearest = _internalIndex;
     final target = _animationValueToAlignment(nearest.toDouble());
     _internalAnimation = _internalAnimationController.drive(AlignmentTween(
       begin: _currentIndicatorAlignment,
@@ -176,6 +172,7 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
     return Alignment(x, 0);
   }
 
+  int get _internalIndex => _alignmentToIndex(_currentIndicatorAlignment);
   int _alignmentToIndex(Alignment alignment) {
     final currentPosition =
         (_controller!.length - 1) * _convertXToCoef(alignment);
@@ -191,13 +188,20 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
     return DefaultTextStyle(
       style: widget.textStyle ?? DefaultTextStyle.of(context).style,
       child: LayoutBuilder(builder: (context, constraints) {
-        final currentTab =
-            widget.tabs[_alignmentToIndex(_currentIndicatorAlignment)];
+        final currentTab = widget.tabs[_internalIndex];
         final indicatorWidth =
             (constraints.maxWidth - widget.indicatorPadding.horizontal) /
                 _controller!.length;
+        final textStyle =
+            widget.textStyle ?? Theme.of(context).textTheme.bodyText2!;
+        final selectedTabTextColor = currentTab.selectedTextColor ??
+            widget.selectedTabTextColor ??
+            Colors.white;
+        final tabTextColor = widget.tabs[_internalIndex].textColor ??
+            widget.tabTextColor ??
+            Colors.white.withOpacity(0.7);
         return ClipRRect(
-          borderRadius: widget.borderRadius,
+          borderRadius: BorderRadius.all(widget.radius),
           child: SizedBox(
             height: widget.height,
             child: Stack(
@@ -206,10 +210,10 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
                   duration: kTabScrollDuration,
                   curve: Curves.ease,
                   decoration: BoxDecoration(
-                    color: currentTab.selectedBackgroundColor ??
+                    color: currentTab.backgroundColor ??
                         widget.backgroundColor ??
                         Theme.of(context).colorScheme.background,
-                    borderRadius: widget.borderRadius,
+                    borderRadius: BorderRadius.all(widget.radius),
                   ),
                   child: Material(
                     color: Colors.transparent,
@@ -217,10 +221,24 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
                       style: (widget.textStyle ??
                               DefaultTextStyle.of(context).style)
                           .copyWith(
-                              color: currentTab.unselectedTextColor ??
+                              color: currentTab.textColor ??
                                   widget.tabTextColor ??
                                   Theme.of(context).colorScheme.onBackground),
-                      child: _buildTabLabels(constraints.maxWidth),
+                      child: _Labels(
+                        radius: widget.radius,
+                        splashColor: widget.splashColor,
+                        splashHighlightColor: widget.splashHighlightColor,
+                        callbackBuilder: (index) => () {
+                          _internalAnimationController.stop();
+                          _controller!.animateTo(index);
+                        },
+                        availableSpace: constraints.maxWidth,
+                        tabs: widget.tabs,
+                        currentIndex: _internalIndex,
+                        textStyle: textStyle.copyWith(
+                          color: tabTextColor,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -256,44 +274,63 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
                         _currentTilePadding = EdgeInsets.zero;
                       });
                     },
-                    child: _squeezeAnimated((_) => AnimatedContainer(
-                          duration: kTabScrollDuration,
-                          curve: Curves.ease,
-                          width: indicatorWidth,
-                          height:
-                              widget.height - widget.indicatorPadding.vertical,
-                          decoration: BoxDecoration(
-                            color: currentTab.selectedColor ??
-                                widget.indicatorColor ??
-                                Theme.of(context).indicatorColor,
-                            borderRadius: widget.borderRadius,
-                          ),
-                        )),
+                    child: _SqueezeAnimated(
+                      currentTilePadding: _currentTilePadding,
+                      squeezeDuration: widget.squeezeDuration,
+                      builder: (_) => AnimatedContainer(
+                        duration: kTabScrollDuration,
+                        curve: Curves.ease,
+                        width: indicatorWidth,
+                        height:
+                            widget.height - widget.indicatorPadding.vertical,
+                        decoration: BoxDecoration(
+                          color: currentTab.color ??
+                              widget.indicatorColor ??
+                              Theme.of(context).indicatorColor,
+                          borderRadius: BorderRadius.all(widget.radius),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                _squeezeAnimated((squeezePadding) => ClipPath(
-                      clipper: RRectRevealClipper(
-                        radius: widget.radius,
-                        size: Size(
-                          indicatorWidth,
-                          widget.height -
-                              widget.indicatorPadding.vertical -
-                              squeezePadding.vertical,
-                        ),
-                        offset: Offset(
-                            _convertXToCoef(_currentIndicatorAlignment) *
-                                (constraints.maxWidth - indicatorWidth),
-                            0),
+                _SqueezeAnimated(
+                  currentTilePadding: _currentTilePadding,
+                  squeezeDuration: widget.squeezeDuration,
+                  builder: (squeezePadding) => ClipPath(
+                    clipper: RRectRevealClipper(
+                      radius: widget.radius,
+                      size: Size(
+                        indicatorWidth,
+                        widget.height -
+                            widget.indicatorPadding.vertical -
+                            squeezePadding.vertical,
                       ),
-                      child: DefaultTextStyle.merge(
-                        style: DefaultTextStyle.of(context).style.copyWith(
-                            color: widget.selectedTabTextColor ??
-                                Theme.of(context).colorScheme.onSecondary),
-                        child: IgnorePointer(
-                          child: _buildTabLabels(constraints.maxWidth, true),
+                      offset: Offset(
+                        _convertXToCoef(_currentIndicatorAlignment) *
+                            (constraints.maxWidth - indicatorWidth),
+                        0,
+                      ),
+                    ),
+                    child: DefaultTextStyle.merge(
+                      style: DefaultTextStyle.of(context).style.copyWith(
+                          color: widget.selectedTabTextColor ??
+                              Theme.of(context).colorScheme.onSecondary),
+                      child: IgnorePointer(
+                        child: _Labels(
+                          radius: widget.radius,
+                          splashColor: widget.splashColor,
+                          splashHighlightColor: widget.splashHighlightColor,
+                          availableSpace: constraints.maxWidth,
+                          tabs: widget.tabs,
+                          currentIndex: _internalIndex,
+                          textStyle: textStyle.copyWith(
+                            color: selectedTabTextColor,
+                          ),
                         ),
                       ),
-                    )),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -301,45 +338,59 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
       }),
     );
   }
+}
 
-  Widget _buildTabLabels(double availableSpace, [bool selectedTabs = false]) {
-    final width = availableSpace / _controller!.length;
+class _Labels extends StatelessWidget {
+  _Labels({
+    Key? key,
+    this.callbackBuilder,
+    required this.availableSpace,
+    required this.tabs,
+    required this.currentIndex,
+    required this.textStyle,
+    this.radius = const Radius.circular(20),
+    this.splashColor,
+    this.splashHighlightColor,
+    this.tabPadding = const EdgeInsets.symmetric(horizontal: 8),
+  }) : super(key: key);
+
+  final VoidCallback Function(int index)? callbackBuilder;
+  final double availableSpace;
+  final List<CustomizableTab> tabs;
+  final int currentIndex;
+  final TextStyle textStyle;
+  final EdgeInsets tabPadding;
+  final Radius radius;
+  final Color? splashColor;
+  final Color? splashHighlightColor;
+
+  late final width = availableSpace / tabs.length;
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(
-          widget.tabs.length,
+          tabs.length,
           (index) {
-            final tab = widget.tabs[index];
+            final tab = tabs[index];
             return SizedBox(
               width: width,
               child: InkWell(
-                splashColor: tab.splashColor ?? widget.splashColor,
+                splashColor: tab.splashColor ?? splashColor,
                 highlightColor:
-                    tab.splashHighlightColor ?? widget.splashHighlightColor,
-                borderRadius: widget.borderRadius,
-                onTap: () {
-                  _internalAnimationController.stop();
-                  _controller!.animateTo(index);
-                },
+                    tab.splashHighlightColor ?? splashHighlightColor,
+                borderRadius: BorderRadius.all(radius),
+                onTap: callbackBuilder?.call(index),
                 child: Padding(
-                  padding: widget.tabPadding,
+                  padding: tabPadding,
                   child: Center(
                     child: Text(
                       tab.label,
                       overflow: TextOverflow.clip,
                       maxLines: 1,
-                      style: (widget.textStyle ??
-                              Theme.of(context).textTheme.bodyText2!)
-                          .copyWith(
-                        color: selectedTabs
-                            ? tab.selectedTextColor ??
-                                widget.selectedTabTextColor ??
-                                Colors.white
-                            : tab.unselectedTextColor ??
-                                widget.tabTextColor ??
-                                Colors.white.withOpacity(0.7),
-                      ),
+                      style: textStyle,
                     ),
                   ),
                 ),
@@ -350,15 +401,29 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
       ),
     );
   }
+}
 
-  Widget _squeezeAnimated(Widget Function(EdgeInsets) builder) {
+class _SqueezeAnimated extends StatelessWidget {
+  const _SqueezeAnimated({
+    Key? key,
+    required this.builder,
+    required this.currentTilePadding,
+    this.squeezeDuration = const Duration(milliseconds: 500),
+  }) : super(key: key);
+
+  final Widget Function(EdgeInsets) builder;
+  final EdgeInsets currentTilePadding;
+  final Duration squeezeDuration;
+
+  @override
+  Widget build(BuildContext context) {
     return TweenAnimationBuilder<EdgeInsets>(
-      curve: widget.squeezeCurve,
+      curve: Curves.decelerate,
       tween: Tween(
         begin: EdgeInsets.zero,
-        end: _currentTilePadding,
+        end: currentTilePadding,
       ),
-      duration: widget.squeezeDuration,
+      duration: squeezeDuration,
       builder: (context, padding, _) => Padding(
         padding: padding,
         child: builder.call(padding),
