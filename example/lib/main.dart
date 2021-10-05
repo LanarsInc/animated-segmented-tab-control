@@ -35,12 +35,12 @@ class MyApp extends StatelessWidget {
                         backgroundColor: Colors.blueGrey,
                         color: Colors.blueGrey.shade200,
                       ),
-                      const CustomizableTab(
+                      CustomizableTab(
                         label: 'HOME',
-                        backgroundColor: Colors.redAccent,
-                        color: Colors.red,
-                        selectedTextColor: Colors.blueGrey,
-                        textColor: Colors.redAccent,
+                        backgroundColor: Colors.grey.shade100,
+                        color: Colors.white,
+                        selectedTextColor: Colors.black,
+                        textColor: Colors.black.withOpacity(0.5),
                       ),
                       const CustomizableTab(label: 'NEW'),
                     ],
@@ -58,7 +58,6 @@ class MyApp extends StatelessWidget {
                       ),
                       Container(
                         alignment: Alignment.center,
-                        color: Colors.red.withOpacity(0.5),
                         child: const Text('2'),
                       ),
                       Container(

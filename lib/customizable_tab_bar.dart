@@ -185,21 +185,36 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
 
   @override
   Widget build(BuildContext context) {
+    final currentTab = widget.tabs[_internalIndex];
+
+    final textStyle =
+        widget.textStyle ?? Theme.of(context).textTheme.bodyText2!;
+
+    final selectedTabTextColor = currentTab.selectedTextColor ??
+        widget.selectedTabTextColor ??
+        Colors.white;
+
+    final tabTextColor = currentTab.textColor ??
+        widget.tabTextColor ??
+        Colors.white.withOpacity(0.7);
+
+    final backgroundColor = currentTab.backgroundColor ??
+        widget.backgroundColor ??
+        Theme.of(context).colorScheme.background;
+
+    final indicatorColor = currentTab.color ??
+        widget.indicatorColor ??
+        Theme.of(context).indicatorColor;
+
+    final borderRadius = BorderRadius.all(widget.radius);
+
     return DefaultTextStyle(
       style: widget.textStyle ?? DefaultTextStyle.of(context).style,
       child: LayoutBuilder(builder: (context, constraints) {
-        final currentTab = widget.tabs[_internalIndex];
         final indicatorWidth =
             (constraints.maxWidth - widget.indicatorPadding.horizontal) /
                 _controller!.length;
-        final textStyle =
-            widget.textStyle ?? Theme.of(context).textTheme.bodyText2!;
-        final selectedTabTextColor = currentTab.selectedTextColor ??
-            widget.selectedTabTextColor ??
-            Colors.white;
-        final tabTextColor = widget.tabs[_internalIndex].textColor ??
-            widget.tabTextColor ??
-            Colors.white.withOpacity(0.7);
+
         return ClipRRect(
           borderRadius: BorderRadius.all(widget.radius),
           child: SizedBox(
@@ -210,34 +225,21 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
                   duration: kTabScrollDuration,
                   curve: Curves.ease,
                   decoration: BoxDecoration(
-                    color: currentTab.backgroundColor ??
-                        widget.backgroundColor ??
-                        Theme.of(context).colorScheme.background,
-                    borderRadius: BorderRadius.all(widget.radius),
+                    color: backgroundColor,
+                    borderRadius: borderRadius,
                   ),
                   child: Material(
                     color: Colors.transparent,
-                    child: DefaultTextStyle.merge(
-                      style: (widget.textStyle ??
-                              DefaultTextStyle.of(context).style)
-                          .copyWith(
-                              color: currentTab.textColor ??
-                                  widget.tabTextColor ??
-                                  Theme.of(context).colorScheme.onBackground),
-                      child: _Labels(
-                        radius: widget.radius,
-                        splashColor: widget.splashColor,
-                        splashHighlightColor: widget.splashHighlightColor,
-                        callbackBuilder: (index) => () {
-                          _internalAnimationController.stop();
-                          _controller!.animateTo(index);
-                        },
-                        availableSpace: constraints.maxWidth,
-                        tabs: widget.tabs,
-                        currentIndex: _internalIndex,
-                        textStyle: textStyle.copyWith(
-                          color: tabTextColor,
-                        ),
+                    child: _Labels(
+                      radius: widget.radius,
+                      splashColor: widget.splashColor,
+                      splashHighlightColor: widget.splashHighlightColor,
+                      callbackBuilder: _onTabTap(),
+                      availableSpace: constraints.maxWidth,
+                      tabs: widget.tabs,
+                      currentIndex: _internalIndex,
+                      textStyle: textStyle.copyWith(
+                        color: tabTextColor,
                       ),
                     ),
                   ),
@@ -245,35 +247,9 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
                 Align(
                   alignment: _currentIndicatorAlignment,
                   child: GestureDetector(
-                    onPanDown: (details) {
-                      _internalAnimationController.stop();
-                      setState(() {
-                        _currentTilePadding = EdgeInsets.symmetric(
-                            vertical: widget.squeezeIntensity);
-                      });
-                    },
-                    onPanUpdate: (details) {
-                      double x = _currentIndicatorAlignment.x +
-                          details.delta.dx / (constraints.maxWidth / 2);
-                      if (x < -1) {
-                        x = -1;
-                      } else if (x > 1) {
-                        x = 1;
-                      }
-                      setState(() {
-                        _currentIndicatorAlignment = Alignment(x, 0);
-                      });
-                    },
-                    onPanEnd: (details) {
-                      _animateIndicatorToNearest(
-                        details.velocity.pixelsPerSecond,
-                        constraints.maxWidth,
-                      );
-                      _updateControllerIndex();
-                      setState(() {
-                        _currentTilePadding = EdgeInsets.zero;
-                      });
-                    },
+                    onPanDown: _onPanDown(),
+                    onPanUpdate: _onPanUpdate(constraints),
+                    onPanEnd: _onPanEnd(constraints),
                     child: _SqueezeAnimated(
                       currentTilePadding: _currentTilePadding,
                       squeezeDuration: widget.squeezeDuration,
@@ -284,9 +260,7 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
                         height:
                             widget.height - widget.indicatorPadding.vertical,
                         decoration: BoxDecoration(
-                          color: currentTab.color ??
-                              widget.indicatorColor ??
-                              Theme.of(context).indicatorColor,
+                          color: indicatorColor,
                           borderRadius: BorderRadius.all(widget.radius),
                         ),
                       ),
@@ -311,21 +285,16 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
                         0,
                       ),
                     ),
-                    child: DefaultTextStyle.merge(
-                      style: DefaultTextStyle.of(context).style.copyWith(
-                          color: widget.selectedTabTextColor ??
-                              Theme.of(context).colorScheme.onSecondary),
-                      child: IgnorePointer(
-                        child: _Labels(
-                          radius: widget.radius,
-                          splashColor: widget.splashColor,
-                          splashHighlightColor: widget.splashHighlightColor,
-                          availableSpace: constraints.maxWidth,
-                          tabs: widget.tabs,
-                          currentIndex: _internalIndex,
-                          textStyle: textStyle.copyWith(
-                            color: selectedTabTextColor,
-                          ),
+                    child: IgnorePointer(
+                      child: _Labels(
+                        radius: widget.radius,
+                        splashColor: widget.splashColor,
+                        splashHighlightColor: widget.splashHighlightColor,
+                        availableSpace: constraints.maxWidth,
+                        tabs: widget.tabs,
+                        currentIndex: _internalIndex,
+                        textStyle: textStyle.copyWith(
+                          color: selectedTabTextColor,
                         ),
                       ),
                     ),
@@ -337,6 +306,60 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
         );
       }),
     );
+  }
+
+  VoidCallback Function(int)? _onTabTap() {
+    if (_controller!.indexIsChanging) {
+      return null;
+    }
+    return (int index) => () {
+          _internalAnimationController.stop();
+          _controller!.animateTo(index);
+        };
+  }
+
+  GestureDragDownCallback? _onPanDown() {
+    if (_controller!.indexIsChanging) {
+      return null;
+    }
+    return (details) {
+      _internalAnimationController.stop();
+      setState(() {
+        _currentTilePadding =
+            EdgeInsets.symmetric(vertical: widget.squeezeIntensity);
+      });
+    };
+  }
+
+  GestureDragUpdateCallback? _onPanUpdate(BoxConstraints constraints) {
+    if (_controller!.indexIsChanging) {
+      return null;
+    }
+    return (details) {
+      double x = _currentIndicatorAlignment.x +
+          details.delta.dx / (constraints.maxWidth / 2);
+      if (x < -1) {
+        x = -1;
+      } else if (x > 1) {
+        x = 1;
+      }
+      setState(() {
+        _currentIndicatorAlignment = Alignment(x, 0);
+      });
+    };
+  }
+
+  GestureDragEndCallback _onPanEnd(BoxConstraints constraints) {
+    return (details) {
+      _animateIndicatorToNearest(
+        details.velocity.pixelsPerSecond,
+        constraints.maxWidth,
+      );
+      _updateControllerIndex();
+      setState(() {
+        _currentTilePadding = EdgeInsets.zero;
+      });
+    };
   }
 }
 
