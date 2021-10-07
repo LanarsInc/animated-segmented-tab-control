@@ -1,4 +1,4 @@
-part of customizable_tab_bar;
+import 'package:flutter/material.dart';
 
 @immutable
 class CustomizableTab {
