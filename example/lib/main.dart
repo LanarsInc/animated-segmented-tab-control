@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
                     tabTextColor: Colors.black45,
                     selectedTabTextColor: Colors.white,
                     squeezeIntensity: 2,
-                    height: 30,
+                    height: 36,
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
                     textStyle: Theme.of(context).textTheme.caption,
                     tabs: [
