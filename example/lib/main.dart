@@ -21,26 +21,22 @@ class MyApp extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: CustomizableTabBar(
-                    backgroundColor: Colors.indigoAccent,
-                    indicatorColor: Colors.indigo,
-                    tabTextColor: Colors.white.withOpacity(0.5),
+                    backgroundColor: Colors.grey.shade300,
+                    indicatorColor: Colors.orange.shade200,
+                    tabTextColor: Colors.black45,
                     selectedTabTextColor: Colors.white,
                     squeezeIntensity: 2,
-                    height: 30,
+                    height: 36,
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
                     textStyle: Theme.of(context).textTheme.caption,
                     tabs: [
                       CustomizableTab(
                         label: 'ACCOUNT',
-                        backgroundColor: Colors.blueGrey,
-                        color: Colors.blueGrey.shade200,
+                        color: Colors.red.shade200,
                       ),
                       CustomizableTab(
                         label: 'HOME',
-                        backgroundColor: Colors.grey.shade100,
-                        color: Colors.white,
-                        selectedTextColor: Colors.black,
-                        textColor: Colors.black.withOpacity(0.5),
+                        color: Colors.green.shade200,
                       ),
                       const CustomizableTab(label: 'NEW'),
                     ],
@@ -51,19 +47,17 @@ class MyApp extends StatelessWidget {
                   child: TabBarView(
                     physics: const BouncingScrollPhysics(),
                     children: [
-                      Container(
-                        alignment: Alignment.center,
-                        color: Colors.blueGrey.withOpacity(0.5),
-                        child: const Text('1'),
+                      SampleWidget(
+                        label: 'FIRST PAGE',
+                        color: Colors.red.shade200,
                       ),
-                      Container(
-                        alignment: Alignment.center,
-                        child: const Text('2'),
+                      SampleWidget(
+                        label: 'SECOND PAGE',
+                        color: Colors.green.shade200,
                       ),
-                      Container(
-                        alignment: Alignment.center,
-                        color: Colors.blue.withOpacity(0.5),
-                        child: const Text('3'),
+                      SampleWidget(
+                        label: 'THIRD PAGE',
+                        color: Colors.orange.shade200,
                       ),
                     ],
                   ),
@@ -73,6 +67,28 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class SampleWidget extends StatelessWidget {
+  const SampleWidget({
+    Key? key,
+    required this.label,
+    required this.color,
+  }) : super(key: key);
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+          color: color,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
+      child: Text(label),
     );
   }
 }
