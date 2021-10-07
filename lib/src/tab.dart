@@ -1,23 +1,23 @@
-part of customizable_tab_bar;
+import 'package:flutter/material.dart';
 
 @immutable
 class CustomizableTab {
   const CustomizableTab({
     required this.label,
-    this.selectedColor,
+    this.color,
     this.selectedTextColor,
-    this.selectedBackgroundColor,
-    this.unselectedTextColor,
+    this.backgroundColor,
+    this.textColor,
     this.splashColor,
     this.splashHighlightColor,
   });
 
   final String label;
   // All provided properties will replace the colors specified in [RoundedTabBar]
-  final Color? selectedColor;
+  final Color? color;
   final Color? selectedTextColor;
-  final Color? selectedBackgroundColor;
-  final Color? unselectedTextColor;
+  final Color? backgroundColor;
+  final Color? textColor;
   final Color? splashColor;
   final Color? splashHighlightColor;
 }
