@@ -104,7 +104,7 @@ or
 _controller.index
 ```
 
-You can find more examples here: https://github.com/LanarsInc/animated-segmented-tab-control/example
+You can find more examples here: https://github.com/LanarsInc/animated-segmented-tab-control/tree/main/example
 
 ## Additional information
 
