@@ -1,4 +1,4 @@
-import 'package:customizable_tab_bar/customizable_tab_bar.dart';
+import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: CustomizableTabBar(
+                  child: SegmentedTabControl(
                     backgroundColor: Colors.grey.shade300,
                     indicatorColor: Colors.orange.shade200,
                     tabTextColor: Colors.black45,
@@ -30,15 +30,15 @@ class MyApp extends StatelessWidget {
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
                     textStyle: Theme.of(context).textTheme.caption,
                     tabs: [
-                      CustomizableTab(
+                      SegmentTab(
                         label: 'ACCOUNT',
                         color: Colors.red.shade200,
                       ),
-                      CustomizableTab(
+                      SegmentTab(
                         label: 'HOME',
                         color: Colors.green.shade200,
                       ),
-                      const CustomizableTab(label: 'NEW'),
+                      const SegmentTab(label: 'NEW'),
                     ],
                   ),
                 ),

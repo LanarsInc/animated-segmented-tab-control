@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  customizable_tab_bar:
+  animated_segmented_tab_control:
     path: ../../
 
 dev_dependencies:

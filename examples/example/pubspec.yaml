@@ -15,7 +15,7 @@ dependencies:
 
   cupertino_icons: ^1.0.2
 
-  customizable_tab_bar:
+  animated_segmented_tab_control:
     path: ../../
 
 dev_dependencies:

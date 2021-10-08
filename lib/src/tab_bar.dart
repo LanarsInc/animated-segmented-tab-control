@@ -4,8 +4,9 @@ import 'package:flutter/physics.dart';
 import 'tab.dart';
 import 'utils/custom_clippers.dart';
 
-class CustomizableTabBar extends StatefulWidget implements PreferredSizeWidget {
-  const CustomizableTabBar({
+class SegmentedTabControl extends StatefulWidget
+    implements PreferredSizeWidget {
+  const SegmentedTabControl({
     Key? key,
     this.height = 46,
     required this.tabs,
@@ -25,7 +26,7 @@ class CustomizableTabBar extends StatefulWidget implements PreferredSizeWidget {
   }) : super(key: key);
 
   final double height;
-  final List<CustomizableTab> tabs;
+  final List<SegmentTab> tabs;
   final TabController? controller;
   final Color? backgroundColor;
   final TextStyle? textStyle;
@@ -41,13 +42,13 @@ class CustomizableTabBar extends StatefulWidget implements PreferredSizeWidget {
   final Color? splashHighlightColor;
 
   @override
-  _CustomizableTabBarState createState() => _CustomizableTabBarState();
+  _SegmentedTabControlState createState() => _SegmentedTabControlState();
 
   @override
   Size get preferredSize => Size.fromHeight(height);
 }
 
-class _CustomizableTabBarState extends State<CustomizableTabBar>
+class _SegmentedTabControlState extends State<SegmentedTabControl>
     with SingleTickerProviderStateMixin {
   EdgeInsets _currentTilePadding = EdgeInsets.zero;
   Alignment _currentIndicatorAlignment = Alignment.centerLeft;
@@ -76,7 +77,7 @@ class _CustomizableTabBarState extends State<CustomizableTabBar>
   }
 
   @override
-  void didUpdateWidget(CustomizableTabBar oldWidget) {
+  void didUpdateWidget(SegmentedTabControl oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
       _updateTabController();
@@ -376,7 +377,7 @@ class _Labels extends StatelessWidget {
 
   final VoidCallback Function(int index)? callbackBuilder;
   final double availableSpace;
-  final List<CustomizableTab> tabs;
+  final List<SegmentTab> tabs;
   final int currentIndex;
   final TextStyle textStyle;
   final EdgeInsets tabPadding;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 @immutable
-class CustomizableTab {
-  const CustomizableTab({
+class SegmentTab {
+  const SegmentTab({
     required this.label,
     this.color,
     this.selectedTextColor,
