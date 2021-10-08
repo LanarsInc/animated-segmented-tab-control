@@ -1,5 +1,5 @@
-name: customizable_tab_bar
-description: A Flutter package for cistomizable tab bar.
+name: animated_segmented_tab_control
+description: A customizable segmented control that can be used with a TabView.
 version: 0.0.1
 
 environment:

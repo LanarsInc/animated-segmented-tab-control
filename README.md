@@ -11,29 +11,101 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages). 
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A customizable segment tab control. Can be used with or without TabView.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+The package provides an advanced segmented control widget based on the `TabController`.
+
+![screen-20211007-171939_2](https://user-images.githubusercontent.com/92156712/136547187-fb7eb419-3f18-419f-9ca1-8d25d85b9a44.gif)
+![screen-20211007-170003_2](https://user-images.githubusercontent.com/92156712/136547191-3fd7ac95-0153-4fad-83d8-e356d7133273.gif)
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+To use the package, add the dependency to the `pubspec.yaml` file.
+
+```
+dependencies:
+  ...
+  animated_segmented_tab_control: any
+```
+
+And import the library.
+
+```dart
+import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+The package contains a `SegmentedTabControl` widget that requires a `SegmentTab` list.
 
 ```dart
-const like = 'sample';
+SegmentedTabControl(
+  tabs: [
+    SegmentTab(
+      label: "Home".
+    ),
+  ],
+)
 ```
+
+SegmentedTabControl also requires a TabController. You can provide it with a `DefaultTabController` or instantiate a `TabController` instead.
+
+```dart
+DefaultTabController(
+  length: 2,
+  SegmentedTabControl(
+    tabs: [
+      SegmentTab(
+        label: "Home",
+      ),
+      SegmentTab(
+        label: "Account",
+      ),
+    ],
+  )
+)
+```
+
+You can change the entire widget or an individual tab. Or combine it. All provided values in the `SegmentedTabControl` will be replaced with values from each tab.
+
+```dart
+SegmentedTabControl(
+  backgroundColor: Colors.grey.shade300,
+  indicatorColor: Colors.orange.shade200,
+  tabTextColor: Colors.black45,
+  selectedTabTextColor: Colors.white,
+  tabs: [
+    SegmentTab(
+      label: 'ACCOUNT',
+      color: Colors.red.shade200,
+    ),
+    SegmentTab(
+      label: 'HOME',
+      backgroundColor: Colors.blue.shade100,
+      selectedTextColor: Colors.black45,
+      textColor: Colors.black26,
+    ),
+    const SegmentTab(label: 'NEW'),
+  ],
+),
+```
+
+Change tracking logic is identical to TabBar logic.
+
+```dart
+DefaultTabController.of(context).index
+```
+
+or
+
+```dart
+_controller.index
+```
+
+You can find more examples here: https://github.com/LanarsInc/animated-segmented-tab-control/examples
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+If you have any ideas or are running into a bug, please submit an issue on github page: https://github.com/LanarsInc/animated-segmented-tab-control/issues
