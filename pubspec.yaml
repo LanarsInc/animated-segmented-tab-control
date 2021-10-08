@@ -1,5 +1,6 @@
 name: animated_segmented_tab_control
 description: A customizable segmented control that can be used with a TabView.
+repository: https://github.com/LanarsInc/animated-segmented-tab-control.git
 version: 0.0.1
 
 environment:
