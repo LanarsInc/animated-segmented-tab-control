@@ -4,7 +4,7 @@ packages:
   animated_segmented_tab_control:
     dependency: "direct main"
     description:
-      path: "../.."
+      path: ".."
       relative: true
     source: path
     version: "0.0.1"

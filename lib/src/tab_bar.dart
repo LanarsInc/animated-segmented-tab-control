@@ -4,6 +4,10 @@ import 'package:flutter/physics.dart';
 import 'tab.dart';
 import 'utils/custom_clippers.dart';
 
+/// Widget based on [TabController]. Can simply replace [TabBar].
+///
+/// Requires [TabController], witch can be read from [context] with
+/// [DefaultTabController] using. Or you can provide controller in the constructor.
 class SegmentedTabControl extends StatefulWidget
     implements PreferredSizeWidget {
   const SegmentedTabControl({
@@ -25,20 +29,57 @@ class SegmentedTabControl extends StatefulWidget
     this.splashHighlightColor,
   }) : super(key: key);
 
+  /// Height of the widget.
+  ///
+  /// [preferredSize] returns this value.
   final double height;
+
+  /// Selection options.
   final List<SegmentTab> tabs;
+
+  /// Can be provided by [DefaultTabController].
   final TabController? controller;
+
+  /// The color of the area beyond the indicator.
   final Color? backgroundColor;
+
+  /// Style of all labels. Color will not applied.
   final TextStyle? textStyle;
+
+  /// The color of the text beyond the indicator.
   final Color? tabTextColor;
+
+  /// The color of the text inside the indicator.
   final Color? selectedTabTextColor;
+
+  /// Color of the indicator.
   final Color? indicatorColor;
+
+  /// Intensity of squeeze animation.
+  ///
+  /// This animation starts when you click on the indicator and stops when you
+  /// take your finger off the indicator.
   final double squeezeIntensity;
+
+  /// Duration of squeeze animation.
+  ///
+  /// This animation starts when you click on the indicator and stops when you
+  /// take your finger off the indicator.
   final Duration squeezeDuration;
+
+  /// Only vertical padding will be applied.
   final EdgeInsets indicatorPadding;
+
+  /// Padding of labels.
   final EdgeInsets tabPadding;
+
+  /// Radius of widget and indicator.
   final Radius radius;
+
+  /// Splash color of options.
   final Color? splashColor;
+
+  /// Splash highlight color of options.
   final Color? splashHighlightColor;
 
   @override
@@ -166,18 +207,20 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     if (value == null) {
       return const Alignment(-1, 0);
     }
-    final x = value / (_controller!.length - 1) * 2 - 1;
+    final inPercents = value / (_controller!.length - 1);
+    final x = inPercents * 2 - 1;
     return Alignment(x, 0);
   }
 
   int get _internalIndex => _alignmentToIndex(_currentIndicatorAlignment);
   int _alignmentToIndex(Alignment alignment) {
     final currentPosition =
-        (_controller!.length - 1) * _convertXToCoef(alignment);
+        (_controller!.length - 1) * _xToPercentsCoef(alignment);
     return currentPosition.round();
   }
 
-  double _convertXToCoef(Alignment alignment) {
+  /// Converts [Alignment.x] value in range -1..1 to 0..1 percents coefficient
+  double _xToPercentsCoef(Alignment alignment) {
     return (alignment.x + 1) / 2;
   }
 
@@ -278,7 +321,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                             squeezePadding.vertical,
                       ),
                       offset: Offset(
-                        _convertXToCoef(_currentIndicatorAlignment) *
+                        _xToPercentsCoef(_currentIndicatorAlignment) *
                             (constraints.maxWidth - indicatorWidth),
                         0,
                       ),

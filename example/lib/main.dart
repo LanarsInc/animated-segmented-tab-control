@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // Provide the [TabController]
       home: DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -21,27 +22,35 @@ class MyApp extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: SegmentedTabControl(
+                    // Customization of widget
+                    radius: const Radius.circular(3),
                     backgroundColor: Colors.grey.shade300,
                     indicatorColor: Colors.orange.shade200,
                     tabTextColor: Colors.black45,
                     selectedTabTextColor: Colors.white,
                     squeezeIntensity: 2,
-                    height: 36,
+                    height: 45,
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
-                    textStyle: Theme.of(context).textTheme.caption,
+                    textStyle: Theme.of(context).textTheme.bodyText1,
+                    // Options for selection
+                    // All specified values will override the [SegmentedTabControl] setting
                     tabs: [
                       SegmentTab(
                         label: 'ACCOUNT',
+                        // For example, this overrides [indicatorColor] from [SegmentedTabControl]
                         color: Colors.red.shade200,
                       ),
                       SegmentTab(
                         label: 'HOME',
-                        color: Colors.green.shade200,
+                        backgroundColor: Colors.blue.shade100,
+                        selectedTextColor: Colors.black45,
+                        textColor: Colors.black26,
                       ),
                       const SegmentTab(label: 'NEW'),
                     ],
                   ),
                 ),
+                // Sample pages
                 Padding(
                   padding: const EdgeInsets.only(top: 70),
                   child: TabBarView(
@@ -53,7 +62,7 @@ class MyApp extends StatelessWidget {
                       ),
                       SampleWidget(
                         label: 'SECOND PAGE',
-                        color: Colors.green.shade200,
+                        color: Colors.blue.shade100,
                       ),
                       SampleWidget(
                         label: 'THIRD PAGE',
