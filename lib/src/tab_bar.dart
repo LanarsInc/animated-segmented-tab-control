@@ -207,18 +207,20 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     if (value == null) {
       return const Alignment(-1, 0);
     }
-    final x = value / (_controller!.length - 1) * 2 - 1;
+    final inPercents = value / (_controller!.length - 1);
+    final x = inPercents * 2 - 1;
     return Alignment(x, 0);
   }
 
   int get _internalIndex => _alignmentToIndex(_currentIndicatorAlignment);
   int _alignmentToIndex(Alignment alignment) {
     final currentPosition =
-        (_controller!.length - 1) * _convertXToCoef(alignment);
+        (_controller!.length - 1) * _xToPercentsCoef(alignment);
     return currentPosition.round();
   }
 
-  double _convertXToCoef(Alignment alignment) {
+  /// Converts [Alignment.x] value in range -1..1 to 0..1 percents coefficient
+  double _xToPercentsCoef(Alignment alignment) {
     return (alignment.x + 1) / 2;
   }
 
@@ -319,7 +321,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                             squeezePadding.vertical,
                       ),
                       offset: Offset(
-                        _convertXToCoef(_currentIndicatorAlignment) *
+                        _xToPercentsCoef(_currentIndicatorAlignment) *
                             (constraints.maxWidth - indicatorWidth),
                         0,
                       ),
