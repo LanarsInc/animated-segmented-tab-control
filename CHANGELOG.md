@@ -1,6 +1,6 @@
 ## 1.0.0
 
-* Added documantation.
+* Added documentation.
 * Updated example with pub.dev rules.
 * Initial stable release.
 
