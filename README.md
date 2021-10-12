@@ -19,8 +19,6 @@ A customizable segment tab control. Can be used with or without TabView.
 
 The package provides an advanced segmented control widget based on the `TabController`.
 
-Made in [lanars.com](https://lanars.com).
-
 ![screen-20211007-171939_2](https://user-images.githubusercontent.com/92156712/136547187-fb7eb419-3f18-419f-9ca1-8d25d85b9a44.gif)
 ![screen-20211007-170003_2](https://user-images.githubusercontent.com/92156712/136547191-3fd7ac95-0153-4fad-83d8-e356d7133273.gif)
 
@@ -111,3 +109,5 @@ _controller.index
 ## Additional information
 
 If you have any ideas or are running into a bug, please submit an issue on github page: https://github.com/LanarsInc/animated-segmented-tab-control/issues
+
+Made in [lanars.com](https://lanars.com).
