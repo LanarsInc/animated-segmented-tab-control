@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // Provide the [TabController]
       home: DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: SegmentedTabControl(
+                    // Customization of widget
                     radius: const Radius.circular(3),
                     backgroundColor: Colors.grey.shade300,
                     indicatorColor: Colors.orange.shade200,
@@ -30,9 +32,12 @@ class MyApp extends StatelessWidget {
                     height: 45,
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
                     textStyle: Theme.of(context).textTheme.bodyText1,
+                    // Options for selection
+                    // All specified values will override the [SegmentedTabControl] setting
                     tabs: [
                       SegmentTab(
                         label: 'ACCOUNT',
+                        // For example, this overrides [indicatorColor] from [SegmentedTabControl]
                         color: Colors.red.shade200,
                       ),
                       SegmentTab(
@@ -45,6 +50,7 @@ class MyApp extends StatelessWidget {
                     ],
                   ),
                 ),
+                // Sample pages
                 Padding(
                   padding: const EdgeInsets.only(top: 70),
                   child: TabBarView(
