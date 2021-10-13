@@ -31,7 +31,7 @@ To use the package, add the dependency to the `pubspec.yaml` file.
 ```
 dependencies:
   ...
-  animated_segmented_tab_control: ^1.0.0
+  animated_segmented_tab_control: ^1.0.1
 ```
 
 And import the library.
