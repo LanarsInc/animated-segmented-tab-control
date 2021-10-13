@@ -11,9 +11,11 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages). 
 -->
 
-[![pub package](https://img.shields.io/pub/v/animated_segmented_tab_control)](https://pub.dev/packages/animated_segmented_tab_control)
-
 A customizable segment tab control. Can be used with or without TabView.
+
+Made in [lanars.com](https://lanars.com).
+
+[![pub package](https://img.shields.io/pub/v/animated_segmented_tab_control)](https://pub.dev/packages/animated_segmented_tab_control)
 
 ## Features
 
@@ -109,5 +111,3 @@ _controller.index
 ## Additional information
 
 If you have any ideas or are running into a bug, please submit an issue on github page: https://github.com/LanarsInc/animated-segmented-tab-control/issues
-
-Made in [lanars.com](https://lanars.com).
