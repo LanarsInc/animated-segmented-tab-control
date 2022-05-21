@@ -297,7 +297,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                       currentTilePadding: _currentTilePadding,
                       squeezeDuration: widget.squeezeDuration,
                       builder: (_) => AnimatedContainer(
-                        margin: EdgeInsets.only(horizontal: 5),
+                        margin: EdgeInsets.symmetric(horizontal: 5),
                         duration: kTabScrollDuration,
                         curve: Curves.ease,
                         width: indicatorWidth,
