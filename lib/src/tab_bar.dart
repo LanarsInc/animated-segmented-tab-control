@@ -339,8 +339,8 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                         textStyle: textStyle.copyWith(
                           color: selectedTabTextColor,
                         ),
+                        tabPadding: widget.tabPadding,
                       ),
-                      tabPadding: widget.tabPadding,
                     ),
                   ),
                 ),
