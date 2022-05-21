@@ -153,6 +153,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     _controller = newController;
     if (_controller != null) {
       _controller!.animation!.addListener(_handleTabControllerAnimationTick);
+      _handleTabControllerAnimationTick();
     }
   }
 
@@ -282,6 +283,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                       textStyle: textStyle.copyWith(
                         color: tabTextColor,
                       ),
+                      tabPadding: widget.tabPadding,
                     ),
                   ),
                 ),
@@ -338,6 +340,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                           color: selectedTabTextColor,
                         ),
                       ),
+                      tabPadding: widget.tabPadding,
                     ),
                   ),
                 ),
