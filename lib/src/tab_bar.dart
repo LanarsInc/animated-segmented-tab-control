@@ -92,7 +92,10 @@ class SegmentedTabControl extends StatefulWidget
 class _SegmentedTabControlState extends State<SegmentedTabControl>
     with SingleTickerProviderStateMixin {
   EdgeInsets _currentTilePadding = EdgeInsets.zero;
-  Alignment _currentIndicatorAlignment = Alignment.centerLeft;
+  late Alignment _currentIndicatorAlignment = _animationValueToAlignment(
+      widget.controller?.index.toDouble(),
+      length: widget.controller?.length ?? 0);
+  // Initialize the indicator's position with TabController.initialIndex
   late AnimationController _internalAnimationController;
   late Animation<Alignment> _internalAnimation;
   TabController? _controller;
@@ -164,7 +167,8 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
 
   void _handleTabControllerAnimationTick() {
     final currentValue = _controller!.animation!.value;
-    _animateIndicatorTo(_animationValueToAlignment(currentValue));
+    _animateIndicatorTo(
+        _animationValueToAlignment(currentValue, length: _controller!.length));
   }
 
   void _updateControllerIndex() {
@@ -174,7 +178,8 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
   TickerFuture _animateIndicatorToNearest(
       Offset pixelsPerSecond, double width) {
     final nearest = _internalIndex;
-    final target = _animationValueToAlignment(nearest.toDouble());
+    final target = _animationValueToAlignment(nearest.toDouble(),
+        length: _controller!.length);
     _internalAnimation = _internalAnimationController.drive(AlignmentTween(
       begin: _currentIndicatorAlignment,
       end: target,
@@ -203,11 +208,11 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     return _internalAnimationController.fling();
   }
 
-  Alignment _animationValueToAlignment(double? value) {
+  Alignment _animationValueToAlignment(double? value, {required int length}) {
     if (value == null) {
       return const Alignment(-1, 0);
     }
-    final inPercents = value / (_controller!.length - 1);
+    final inPercents = value / (length - 1);
     final x = inPercents * 2 - 1;
     return Alignment(x, 0);
   }
