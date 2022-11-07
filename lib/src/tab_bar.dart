@@ -20,6 +20,7 @@ class SegmentedTabControl extends StatefulWidget
     this.textStyle,
     this.selectedTabTextColor,
     this.indicatorColor,
+    this.indicatorGradientColor,
     this.squeezeIntensity = 1,
     this.squeezeDuration = const Duration(milliseconds: 500),
     this.indicatorPadding = EdgeInsets.zero,
@@ -54,6 +55,12 @@ class SegmentedTabControl extends StatefulWidget
 
   /// Color of the indicator.
   final Color? indicatorColor;
+   
+  /// A gradient to use when filling the box.
+  ///
+  /// If this is specified, [indicatorColor] has no effect.
+  ///
+  final Gradient? indicatorGradientColor;
 
   /// Intensity of squeeze animation.
   ///
@@ -302,6 +309,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                             widget.height - widget.indicatorPadding.vertical,
                         decoration: BoxDecoration(
                           color: indicatorColor,
+                          gradient: widget.indicatorGradientColor,
                           borderRadius: BorderRadius.all(widget.radius),
                         ),
                       ),
