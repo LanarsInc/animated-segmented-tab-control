@@ -16,6 +16,7 @@ class SegmentedTabControl extends StatefulWidget
     required this.tabs,
     this.controller,
     this.backgroundColor,
+    this.backgroundGradientColor,
     this.tabTextColor,
     this.textStyle,
     this.selectedTabTextColor,
@@ -42,7 +43,13 @@ class SegmentedTabControl extends StatefulWidget
   final TabController? controller;
 
   /// The color of the area beyond the indicator.
-  final Color? backgroundColor;
+  final Color? backgroundColor;  
+    
+  /// A gradient to use when filling the box.
+  ///
+  /// If this is specified, [backgroundColor] has no effect.
+  ///
+  final Gradient? backgroundGradientColor;
 
   /// Style of all labels. Color will not applied.
   final TextStyle? textStyle;
@@ -274,6 +281,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                   curve: Curves.ease,
                   decoration: BoxDecoration(
                     color: backgroundColor,
+                    gradient: widget.backgroundGradientColor,
                     borderRadius: borderRadius,
                   ),
                   child: Material(
