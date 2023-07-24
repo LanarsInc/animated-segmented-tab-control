@@ -113,8 +113,8 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
 
   @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
     _updateTabController();
+    super.didChangeDependencies();
   }
 
   @override
@@ -153,6 +153,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     _controller = newController;
     if (_controller != null) {
       _controller!.animation!.addListener(_handleTabControllerAnimationTick);
+      _currentIndicatorAlignment = _animationValueToAlignment(_controller!.index.toDouble());
     }
   }
 
