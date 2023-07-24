@@ -8,18 +8,19 @@ import 'utils/custom_clippers.dart';
 ///
 /// Requires [TabController], witch can be read from [context] with
 /// [DefaultTabController] using. Or you can provide controller in the constructor.
-class SegmentedTabControl extends StatefulWidget
-    implements PreferredSizeWidget {
+class SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget {
   const SegmentedTabControl({
     Key? key,
     this.height = 46,
     required this.tabs,
     this.controller,
     this.backgroundColor,
+    this.backgroundGradient,
     this.tabTextColor,
     this.textStyle,
     this.selectedTabTextColor,
     this.indicatorColor,
+    this.indicatorGradient,
     this.squeezeIntensity = 1,
     this.squeezeDuration = const Duration(milliseconds: 500),
     this.indicatorPadding = EdgeInsets.zero,
@@ -43,6 +44,11 @@ class SegmentedTabControl extends StatefulWidget
   /// The color of the area beyond the indicator.
   final Color? backgroundColor;
 
+  /// A gradient to use when filling the box.
+  ///
+  /// If this is specified, [backgroundColor] has no effect.
+  final Gradient? backgroundGradient;
+
   /// Style of all labels. Color will not applied.
   final TextStyle? textStyle;
 
@@ -54,6 +60,11 @@ class SegmentedTabControl extends StatefulWidget
 
   /// Color of the indicator.
   final Color? indicatorColor;
+   
+  /// A gradient to use when filling the box.
+  ///
+  /// If this is specified, [indicatorColor] has no effect.
+  final Gradient? indicatorGradient;
 
   /// Intensity of squeeze animation.
   ///
@@ -128,8 +139,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
   bool get _controllerIsValid => _controller?.animation != null;
 
   void _updateTabController() {
-    final TabController? newController =
-        widget.controller ?? DefaultTabController.of(context);
+    final TabController? newController = widget.controller ?? DefaultTabController.of(context);
     assert(() {
       if (newController == null) {
         throw FlutterError(
@@ -171,8 +181,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     _controller!.index = _internalIndex;
   }
 
-  TickerFuture _animateIndicatorToNearest(
-      Offset pixelsPerSecond, double width) {
+  TickerFuture _animateIndicatorToNearest(Offset pixelsPerSecond, double width) {
     final nearest = _internalIndex;
     final target = _animationValueToAlignment(nearest.toDouble());
     _internalAnimation = _internalAnimationController.drive(AlignmentTween(
@@ -213,9 +222,9 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
   }
 
   int get _internalIndex => _alignmentToIndex(_currentIndicatorAlignment);
+
   int _alignmentToIndex(Alignment alignment) {
-    final currentPosition =
-        (_controller!.length - 1) * _xToPercentsCoefficient(alignment);
+    final currentPosition = (_controller!.length - 1) * _xToPercentsCoefficient(alignment);
     return currentPosition.round();
   }
 
@@ -228,24 +237,24 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
   Widget build(BuildContext context) {
     final currentTab = widget.tabs[_internalIndex];
 
-    final textStyle =
-        widget.textStyle ?? Theme.of(context).textTheme.bodyText2!;
+    final textStyle = widget.textStyle ?? Theme.of(context).textTheme.bodyText2!;
 
-    final selectedTabTextColor = currentTab.selectedTextColor ??
-        widget.selectedTabTextColor ??
-        Colors.white;
+    final selectedTabTextColor =
+        currentTab.selectedTextColor ?? widget.selectedTabTextColor ?? Colors.white;
 
-    final tabTextColor = currentTab.textColor ??
-        widget.tabTextColor ??
-        Colors.white.withOpacity(0.7);
+    final tabTextColor =
+        currentTab.textColor ?? widget.tabTextColor ?? Colors.white.withOpacity(0.7);
 
     final backgroundColor = currentTab.backgroundColor ??
         widget.backgroundColor ??
         Theme.of(context).colorScheme.background;
 
-    final indicatorColor = currentTab.color ??
-        widget.indicatorColor ??
-        Theme.of(context).indicatorColor;
+    final backgroundGradient = currentTab.backgroundGradient ?? widget.backgroundGradient;
+
+    final indicatorColor =
+        currentTab.color ?? widget.indicatorColor ?? Theme.of(context).indicatorColor;
+
+    final indicatorGradient = currentTab.gradient ?? widget.indicatorGradient;
 
     final borderRadius = BorderRadius.all(widget.radius);
 
@@ -253,8 +262,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
       style: widget.textStyle ?? DefaultTextStyle.of(context).style,
       child: LayoutBuilder(builder: (context, constraints) {
         final indicatorWidth =
-            (constraints.maxWidth - widget.indicatorPadding.horizontal) /
-                _controller!.length;
+            (constraints.maxWidth - widget.indicatorPadding.horizontal) / _controller!.length;
 
         return ClipRRect(
           borderRadius: BorderRadius.all(widget.radius),
@@ -267,6 +275,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                   curve: Curves.ease,
                   decoration: BoxDecoration(
                     color: backgroundColor,
+                    gradient: backgroundGradient,
                     borderRadius: borderRadius,
                   ),
                   child: Material(
@@ -298,10 +307,10 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                         duration: kTabScrollDuration,
                         curve: Curves.ease,
                         width: indicatorWidth,
-                        height:
-                            widget.height - widget.indicatorPadding.vertical,
+                        height: widget.height - widget.indicatorPadding.vertical,
                         decoration: BoxDecoration(
                           color: indicatorColor,
+                          gradient: indicatorGradient,
                           borderRadius: BorderRadius.all(widget.radius),
                         ),
                       ),
@@ -316,9 +325,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                       radius: widget.radius,
                       size: Size(
                         indicatorWidth,
-                        widget.height -
-                            widget.indicatorPadding.vertical -
-                            squeezePadding.vertical,
+                        widget.height - widget.indicatorPadding.vertical - squeezePadding.vertical,
                       ),
                       offset: Offset(
                         _xToPercentsCoefficient(_currentIndicatorAlignment) *
@@ -366,8 +373,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     return (details) {
       _internalAnimationController.stop();
       setState(() {
-        _currentTilePadding =
-            EdgeInsets.symmetric(vertical: widget.squeezeIntensity);
+        _currentTilePadding = EdgeInsets.symmetric(vertical: widget.squeezeIntensity);
       });
     };
   }
@@ -377,8 +383,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
       return null;
     }
     return (details) {
-      double x = _currentIndicatorAlignment.x +
-          details.delta.dx / (constraints.maxWidth / 2);
+      double x = _currentIndicatorAlignment.x + details.delta.dx / (constraints.maxWidth / 2);
       if (x < -1) {
         x = -1;
       } else if (x > 1) {
@@ -443,8 +448,7 @@ class _Labels extends StatelessWidget {
               width: width,
               child: InkWell(
                 splashColor: tab.splashColor ?? splashColor,
-                highlightColor:
-                    tab.splashHighlightColor ?? splashHighlightColor,
+                highlightColor: tab.splashHighlightColor ?? splashHighlightColor,
                 borderRadius: BorderRadius.all(radius),
                 onTap: callbackBuilder?.call(index),
                 child: Padding(
