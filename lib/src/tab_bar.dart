@@ -97,11 +97,32 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
   late Animation<Alignment> _internalAnimation;
   TabController? _controller;
 
+  bool get _controllerIsValid => _controller?.animation != null;
+
+  int get _internalIndex => _alignmentToIndex(_currentIndicatorAlignment);
+
+  int _alignmentToIndex(Alignment alignment) {
+    final currentPosition =
+        (_controller!.length - 1) * _xToPercentsCoefficient(alignment);
+    return currentPosition.round();
+  }
+
+  /// Converts [Alignment.x] value in range -1..1 to 0..1 percents coefficient
+  double _xToPercentsCoefficient(Alignment alignment) {
+    return (alignment.x + 1) / 2;
+  }
+
   @override
   void initState() {
     super.initState();
     _internalAnimationController = AnimationController(vsync: this);
     _internalAnimationController.addListener(_handleInternalAnimationTick);
+  }
+
+  void _handleInternalAnimationTick() {
+    setState(() {
+      _currentIndicatorAlignment = _internalAnimation.value;
+    });
   }
 
   @override
@@ -124,8 +145,6 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
       _updateTabController();
     }
   }
-
-  bool get _controllerIsValid => _controller?.animation != null;
 
   void _updateTabController() {
     final TabController? newController =
@@ -157,51 +176,9 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     }
   }
 
-  void _handleInternalAnimationTick() {
-    setState(() {
-      _currentIndicatorAlignment = _internalAnimation.value;
-    });
-  }
-
   void _handleTabControllerAnimationTick() {
     final currentValue = _controller!.animation!.value;
     _animateIndicatorTo(_animationValueToAlignment(currentValue));
-  }
-
-  void _updateControllerIndex() {
-    _controller!.index = _internalIndex;
-  }
-
-  TickerFuture _animateIndicatorToNearest(
-      Offset pixelsPerSecond, double width) {
-    final nearest = _internalIndex;
-    final target = _animationValueToAlignment(nearest.toDouble());
-    _internalAnimation = _internalAnimationController.drive(AlignmentTween(
-      begin: _currentIndicatorAlignment,
-      end: target,
-    ));
-    final unitsPerSecondX = pixelsPerSecond.dx / width;
-    final unitsPerSecond = Offset(unitsPerSecondX, 0);
-    final unitVelocity = unitsPerSecond.distance;
-
-    const spring = SpringDescription(
-      mass: 30,
-      stiffness: 1,
-      damping: 1,
-    );
-
-    final simulation = SpringSimulation(spring, 0, 1, -unitVelocity);
-
-    return _internalAnimationController.animateWith(simulation);
-  }
-
-  TickerFuture _animateIndicatorTo(Alignment target) {
-    _internalAnimation = _internalAnimationController.drive(AlignmentTween(
-      begin: _currentIndicatorAlignment,
-      end: target,
-    ));
-
-    return _internalAnimationController.fling();
   }
 
   Alignment _animationValueToAlignment(double? value) {
@@ -213,16 +190,13 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     return Alignment(x, 0);
   }
 
-  int get _internalIndex => _alignmentToIndex(_currentIndicatorAlignment);
-  int _alignmentToIndex(Alignment alignment) {
-    final currentPosition =
-        (_controller!.length - 1) * _xToPercentsCoefficient(alignment);
-    return currentPosition.round();
-  }
+  TickerFuture _animateIndicatorTo(Alignment target) {
+    _internalAnimation = _internalAnimationController.drive(AlignmentTween(
+      begin: _currentIndicatorAlignment,
+      end: target,
+    ));
 
-  /// Converts [Alignment.x] value in range -1..1 to 0..1 percents coefficient
-  double _xToPercentsCoefficient(Alignment alignment) {
-    return (alignment.x + 1) / 2;
+    return _internalAnimationController.fling();
   }
 
   @override
@@ -402,6 +376,33 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
         _currentTilePadding = EdgeInsets.zero;
       });
     };
+  }
+
+  TickerFuture _animateIndicatorToNearest(
+      Offset pixelsPerSecond, double width) {
+    final nearest = _internalIndex;
+    final target = _animationValueToAlignment(nearest.toDouble());
+    _internalAnimation = _internalAnimationController.drive(AlignmentTween(
+      begin: _currentIndicatorAlignment,
+      end: target,
+    ));
+    final unitsPerSecondX = pixelsPerSecond.dx / width;
+    final unitsPerSecond = Offset(unitsPerSecondX, 0);
+    final unitVelocity = unitsPerSecond.distance;
+
+    const spring = SpringDescription(
+      mass: 30,
+      stiffness: 1,
+      damping: 1,
+    );
+
+    final simulation = SpringSimulation(spring, 0, 1, -unitVelocity);
+
+    return _internalAnimationController.animateWith(simulation);
+  }
+
+  void _updateControllerIndex() {
+    _controller!.index = _internalIndex;
   }
 }
 
