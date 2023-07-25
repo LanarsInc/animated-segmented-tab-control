@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
                     squeezeIntensity: 2,
                     height: 45,
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
-                    textStyle: Theme.of(context).textTheme.bodyText1,
+                    textStyle: Theme.of(context).textTheme.bodyLarge,
                     // Options for selection
                     // All specified values will override the [SegmentedTabControl] setting
                     tabs: [

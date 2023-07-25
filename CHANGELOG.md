@@ -1,3 +1,9 @@
+## 1.1.0
+
+* Enhancement: Add background and indicator gradient support by [CodeEagle](https://github.com/CodeEagle)
+* Bugfix [#15](https://github.com/LanarsInc/animated-segmented-tab-control/issues/15) Indicator initial position
+* Fix tab bar padding by [phantoms158](https://github.com/phantoms158)
+
 ## 1.0.1
 
 * Minor fixes.

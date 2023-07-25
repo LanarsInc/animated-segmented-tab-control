@@ -59,7 +59,7 @@ SegmentedTabControl also requires a TabController. You can provide it with a `De
 ```dart
 DefaultTabController(
   length: 2,
-  SegmentedTabControl(
+  child: SegmentedTabControl(
     tabs: [
       SegmentTab(
         label: "Home",
