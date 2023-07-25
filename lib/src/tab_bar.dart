@@ -213,7 +213,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
   Widget build(BuildContext context) {
     final currentTab = widget.tabs[_internalIndex];
 
-    final textStyle = widget.textStyle ?? Theme.of(context).textTheme.bodyText2!;
+    final textStyle = widget.textStyle ?? Theme.of(context).textTheme.bodyMedium!;
 
     final selectedTabTextColor =
         currentTab.selectedTextColor ?? widget.selectedTabTextColor ?? Colors.white;
