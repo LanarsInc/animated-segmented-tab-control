@@ -12,14 +12,14 @@ class RRectRevealClipper extends CustomClipper<Path> {
   });
 
   @override
-  Path getClip(Size _) {
+  Path getClip(Size size) {
     return Path()
       ..addRRect(RRect.fromRectAndRadius(
         Rect.fromLTRB(
           offset.dx,
           offset.dy,
-          offset.dx + size.width,
-          offset.dy + size.height,
+          offset.dx + this.size.width,
+          offset.dy + this.size.height,
         ),
         radius,
       ));
