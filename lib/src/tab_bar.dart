@@ -8,7 +8,7 @@ import 'utils/custom_clippers.dart';
 ///
 /// Requires [TabController], witch can be read from [context] with
 /// [DefaultTabController] using. Or you can provide controller in the constructor.
-class SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget {
+class SegmentedTabControl extends StatelessWidget {
   const SegmentedTabControl({
     Key? key,
     this.height = 46,
@@ -94,13 +94,84 @@ class SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget 
   final Color? splashHighlightColor;
 
   @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return _SegmentedTabControl(
+          tabs: tabs,
+          height: height,
+          controller: controller,
+          backgroundColor: backgroundColor,
+          backgroundGradient: backgroundGradient,
+          tabTextColor: tabTextColor,
+          textStyle: textStyle,
+          selectedTabTextColor: selectedTabTextColor,
+          indicatorColor: indicatorColor,
+          indicatorGradient: indicatorGradient,
+          squeezeIntensity: squeezeIntensity,
+          squeezeDuration: squeezeDuration,
+          indicatorPadding: indicatorPadding,
+          tabPadding: tabPadding,
+          radius: radius,
+          splashColor: splashColor,
+          splashHighlightColor: splashHighlightColor,
+          maxWidth: constraints.maxWidth,
+        );
+      },
+    );
+  }
+}
+
+class _SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget {
+  const _SegmentedTabControl({
+    Key? key,
+    this.height = 46,
+    required this.tabs,
+    this.controller,
+    this.backgroundColor,
+    this.backgroundGradient,
+    this.tabTextColor,
+    this.textStyle,
+    this.selectedTabTextColor,
+    this.indicatorColor,
+    this.indicatorGradient,
+    this.squeezeIntensity = 1,
+    this.squeezeDuration = const Duration(milliseconds: 500),
+    this.indicatorPadding = EdgeInsets.zero,
+    this.tabPadding = const EdgeInsets.symmetric(horizontal: 8),
+    this.radius = const Radius.circular(20),
+    this.splashColor,
+    this.splashHighlightColor,
+    required this.maxWidth,
+  }) : super(key: key);
+
+  final double height;
+  final List<SegmentTab> tabs;
+  final TabController? controller;
+  final Color? backgroundColor;
+  final Gradient? backgroundGradient;
+  final TextStyle? textStyle;
+  final Color? tabTextColor;
+  final Color? selectedTabTextColor;
+  final Color? indicatorColor;
+  final Gradient? indicatorGradient;
+  final double squeezeIntensity;
+  final Duration squeezeDuration;
+  final EdgeInsets indicatorPadding;
+  final EdgeInsets tabPadding;
+  final Radius radius;
+  final Color? splashColor;
+  final Color? splashHighlightColor;
+  final double maxWidth;
+
+  @override
   _SegmentedTabControlState createState() => _SegmentedTabControlState();
 
   @override
   Size get preferredSize => Size.fromHeight(height);
 }
 
-class _SegmentedTabControlState extends State<SegmentedTabControl>
+class _SegmentedTabControlState extends State<_SegmentedTabControl>
     with SingleTickerProviderStateMixin {
   EdgeInsets _currentTilePadding = EdgeInsets.zero;
   Alignment _currentIndicatorAlignment = Alignment.centerLeft;
@@ -108,14 +179,19 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
   late Animation<Alignment> _internalAnimation;
   TabController? _controller;
 
+  int totalFlex = 0;
+
+  double _maxWidth = 0;
+
+  List<double> flexFactors = [];
+
   bool get _controllerIsValid => _controller?.animation != null;
 
   int get _internalIndex => _alignmentToIndex(_currentIndicatorAlignment);
 
   int _alignmentToIndex(Alignment alignment) {
-    final currentPosition =
-        (_controller!.length - 1) * _xToPercentsCoefficient(alignment);
-    return currentPosition.round();
+    final currentPosition = _xToPercentsCoefficient(alignment);
+    return flexFactors.indexWhere((element) => element >= currentPosition);
   }
 
   /// Converts [Alignment.x] value in range -1..1 to 0..1 percents coefficient
@@ -126,6 +202,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
   @override
   void initState() {
     super.initState();
+    _maxWidth = widget.maxWidth;
     _internalAnimationController = AnimationController(vsync: this);
     _internalAnimationController.addListener(_handleInternalAnimationTick);
   }
@@ -145,12 +222,24 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
 
   @override
   void didChangeDependencies() {
+    _calculateTotalFlex();
+
+    int currentFlex = 0;
+    for (int i = 0; i < widget.tabs.length; i++) {
+      currentFlex += widget.tabs[i].flex;
+      flexFactors.add(currentFlex / totalFlex);
+    }
+
     _updateTabController();
     super.didChangeDependencies();
   }
 
+  void _calculateTotalFlex() {
+    totalFlex = widget.tabs.fold(0, (previousValue, tab) => previousValue + tab.flex);
+  }
+
   @override
-  void didUpdateWidget(SegmentedTabControl oldWidget) {
+  void didUpdateWidget(_SegmentedTabControl oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
       _updateTabController();
@@ -195,9 +284,28 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     if (value == null) {
       return const Alignment(-1, 0);
     }
+
     final inPercents = value / (_controller!.length - 1);
-    final x = inPercents * 2 - 1;
-    return Alignment(x, 0);
+    final arr = <double>[];
+    final factor = 1 / _controller!.length;
+    for (int i = 0; i < _controller!.length; i++) {
+      arr.add((i + 1) * factor);
+    }
+    final index = arr.indexWhere((element) => element >= inPercents);
+
+    final currentTabWidth = index > 0
+        ? (flexFactors[index] - flexFactors[index - 1]) * _maxWidth
+        : flexFactors[index] * _maxWidth;
+    final currentTabHalfWidth = currentTabWidth / 2;
+
+    final halfMaxWidth = _maxWidth / 2;
+
+    double targetX = index - 1 < 0 ? 0 : _maxWidth * flexFactors[index - 1];
+
+    final alignmentX =
+        (targetX - halfMaxWidth + currentTabHalfWidth) / (halfMaxWidth - currentTabHalfWidth);
+
+    return Alignment(alignmentX, 0);
   }
 
   TickerFuture _animateIndicatorTo(Alignment target) {
@@ -237,8 +345,10 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     return DefaultTextStyle(
       style: widget.textStyle ?? DefaultTextStyle.of(context).style,
       child: LayoutBuilder(builder: (context, constraints) {
+        _maxWidth = constraints.maxWidth;
         final indicatorWidth =
-            (constraints.maxWidth - widget.indicatorPadding.horizontal) / _controller!.length;
+            ((constraints.maxWidth - widget.indicatorPadding.horizontal) / totalFlex) *
+                widget.tabs[_internalIndex].flex;
 
         return ClipRRect(
           borderRadius: BorderRadius.all(widget.radius),
@@ -261,7 +371,6 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                       splashColor: widget.splashColor,
                       splashHighlightColor: widget.splashHighlightColor,
                       callbackBuilder: _onTabTap(),
-                      availableSpace: constraints.maxWidth,
                       tabs: widget.tabs,
                       currentIndex: _internalIndex,
                       textStyle: textStyle.copyWith(
@@ -315,7 +424,6 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
                         radius: widget.radius,
                         splashColor: widget.splashColor,
                         splashHighlightColor: widget.splashHighlightColor,
-                        availableSpace: constraints.maxWidth,
                         tabs: widget.tabs,
                         currentIndex: _internalIndex,
                         textStyle: textStyle.copyWith(
@@ -386,8 +494,7 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
     };
   }
 
-  TickerFuture _animateIndicatorToNearest(
-      Offset pixelsPerSecond, double width) {
+  TickerFuture _animateIndicatorToNearest(Offset pixelsPerSecond, double width) {
     final nearest = _internalIndex;
     final target = _animationValueToAlignment(nearest.toDouble());
     _internalAnimation = _internalAnimationController.drive(AlignmentTween(
@@ -415,10 +522,9 @@ class _SegmentedTabControlState extends State<SegmentedTabControl>
 }
 
 class _Labels extends StatelessWidget {
-  _Labels({
+  const _Labels({
     Key? key,
     this.callbackBuilder,
-    required this.availableSpace,
     required this.tabs,
     required this.currentIndex,
     required this.textStyle,
@@ -429,7 +535,6 @@ class _Labels extends StatelessWidget {
   }) : super(key: key);
 
   final VoidCallback Function(int index)? callbackBuilder;
-  final double availableSpace;
   final List<SegmentTab> tabs;
   final int currentIndex;
   final TextStyle textStyle;
@@ -437,8 +542,6 @@ class _Labels extends StatelessWidget {
   final Radius radius;
   final Color? splashColor;
   final Color? splashHighlightColor;
-
-  late final width = availableSpace / tabs.length;
 
   @override
   Widget build(BuildContext context) {
@@ -449,8 +552,8 @@ class _Labels extends StatelessWidget {
           tabs.length,
           (index) {
             final tab = tabs[index];
-            return SizedBox(
-              width: width,
+            return Flexible(
+              flex: tab.flex,
               child: InkWell(
                 splashColor: tab.splashColor ?? splashColor,
                 highlightColor: tab.splashHighlightColor ?? splashHighlightColor,
@@ -467,6 +570,7 @@ class _Labels extends StatelessWidget {
                         tab.label,
                         overflow: TextOverflow.clip,
                         maxLines: 1,
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
