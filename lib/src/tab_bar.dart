@@ -191,7 +191,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
 
   int _alignmentToIndex(Alignment alignment) {
     final currentPosition = _xToPercentsCoefficient(alignment);
-    return flexFactors.indexWhere((element) => element >= currentPosition);
+    final roundedCurrentPosition = num.parse(currentPosition.toStringAsFixed(2));
+    return flexFactors.indexWhere((element) => element >= roundedCurrentPosition);
   }
 
   /// Converts [Alignment.x] value in range -1..1 to 0..1 percents coefficient
