@@ -224,19 +224,21 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
   @override
   void didChangeDependencies() {
     _calculateTotalFlex();
-
-    int currentFlex = 0;
-    for (int i = 0; i < widget.tabs.length; i++) {
-      currentFlex += widget.tabs[i].flex;
-      flexFactors.add(currentFlex / totalFlex);
-    }
-
+    _calculateFlexFactors();
     _updateTabController();
     super.didChangeDependencies();
   }
 
   void _calculateTotalFlex() {
     totalFlex = widget.tabs.fold(0, (previousValue, tab) => previousValue + tab.flex);
+  }
+
+  void _calculateFlexFactors() {
+    int collectedFlex = 0;
+    for (int i = 0; i < widget.tabs.length; i++) {
+      collectedFlex += widget.tabs[i].flex;
+      flexFactors.add(collectedFlex / totalFlex);
+    }
   }
 
   @override
@@ -286,27 +288,39 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
       return const Alignment(-1, 0);
     }
 
-    final inPercents = value / (_controller!.length - 1);
-    final arr = <double>[];
-    final factor = 1 / _controller!.length;
-    for (int i = 0; i < _controller!.length; i++) {
-      arr.add((i + 1) * factor);
+    final index = _animationValueToTabIndex(value);
+
+    return _calculateAlignmentFromTabIndex(index);
+  }
+
+  int _animationValueToTabIndex(double value) {
+    final lastTabIndex = _controller!.length - 1;
+    final inPercents = value / lastTabIndex;
+    final oneTabInPercents = 1 / _controller!.length;
+    final index = inPercents >= 1 ? lastTabIndex : (inPercents / oneTabInPercents).floor();
+
+    return index;
+  }
+
+  Alignment _calculateAlignmentFromTabIndex(int index) {
+    double tabWidth;
+    double tabLeftX;
+
+    if (index > 0) {
+      tabWidth = (flexFactors[index] - flexFactors[index - 1]) * _maxWidth;
+      tabLeftX = _maxWidth * flexFactors[index - 1];
+    } else {
+      tabWidth = flexFactors[0] * _maxWidth;
+      tabLeftX = 0;
     }
-    final index = arr.indexWhere((element) => element >= inPercents);
 
-    final currentTabWidth = index > 0
-        ? (flexFactors[index] - flexFactors[index - 1]) * _maxWidth
-        : flexFactors[index] * _maxWidth;
-    final currentTabHalfWidth = currentTabWidth / 2;
-
+    final currentTabHalfWidth = tabWidth / 2;
     final halfMaxWidth = _maxWidth / 2;
 
-    double targetX = index - 1 < 0 ? 0 : _maxWidth * flexFactors[index - 1];
+    final x =
+        (tabLeftX - halfMaxWidth + currentTabHalfWidth) / (halfMaxWidth - currentTabHalfWidth);
 
-    final alignmentX =
-        (targetX - halfMaxWidth + currentTabHalfWidth) / (halfMaxWidth - currentTabHalfWidth);
-
-    return Alignment(alignmentX, 0);
+    return Alignment(x, 0);
   }
 
   TickerFuture _animateIndicatorTo(Alignment target) {
