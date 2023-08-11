@@ -13,10 +13,14 @@ class SegmentTab {
     this.textColor,
     this.splashColor,
     this.splashHighlightColor,
+    this.flex = 1,
   });
 
   /// This text will be displayed on tab.
   final String label;
+
+  /// Tab flex factor
+  final int flex;
 
   /// Indicator color when this option is selected.
   ///
