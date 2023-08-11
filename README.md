@@ -26,22 +26,6 @@ The package provides an advanced segmented control widget based on the `TabContr
 ![flexible-tabs-example](https://raw.githubusercontent.com/LanarsInc/animated-segmented-tab-control/main/example/assets/flexible_tabs_example.gif)
 ![neumorphic-example](https://raw.githubusercontent.com/LanarsInc/animated-segmented-tab-control/main/example/assets/neumorphic_example.gif)
 
-## Getting started
-
-To use the package, add the dependency to the `pubspec.yaml` file.
-
-```
-dependencies:
-  ...
-  animated_segmented_tab_control: ^1.0.1
-```
-
-And import the library.
-
-```dart
-import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
-```
-
 ## Usage
 
 The package contains a `SegmentedTabControl` widget that requires a `SegmentTab` list.
