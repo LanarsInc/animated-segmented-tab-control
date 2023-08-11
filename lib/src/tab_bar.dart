@@ -420,18 +420,21 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                     onPanDown: _onPanDown(),
                     onPanUpdate: _onPanUpdate(constraints),
                     onPanEnd: _onPanEnd(constraints),
-                    child: _SqueezeAnimated(
-                      currentTilePadding: _currentTilePadding,
-                      squeezeDuration: widget.squeezeDuration,
-                      builder: (_) => AnimatedContainer(
-                        duration: kTabScrollDuration,
-                        curve: Curves.ease,
-                        width: indicatorWidth,
-                        height: widget.height - widget.indicatorPadding.vertical,
-                        decoration: BoxDecoration(
-                          color: indicatorColor,
-                          gradient: indicatorGradient,
-                          borderRadius: BorderRadius.all(widget.radius),
+                    child: Padding(
+                      padding: widget.indicatorPadding,
+                      child: _SqueezeAnimated(
+                        currentTilePadding: _currentTilePadding,
+                        squeezeDuration: widget.squeezeDuration,
+                        builder: (_) => AnimatedContainer(
+                          duration: kTabScrollDuration,
+                          curve: Curves.ease,
+                          width: indicatorWidth,
+                          height: widget.height - widget.indicatorPadding.vertical,
+                          decoration: BoxDecoration(
+                            color: indicatorColor,
+                            gradient: indicatorGradient,
+                            borderRadius: BorderRadius.all(widget.radius),
+                          ),
                         ),
                       ),
                     ),
