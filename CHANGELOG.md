@@ -1,3 +1,8 @@
+## 1.2.0
+
+* Enhancement: Add possibility to set different sizes of tabs
+* Fix indicator padding
+
 ## 1.1.0
 
 * Enhancement: Add background and indicator gradient support by [CodeEagle](https://github.com/CodeEagle)
