@@ -23,6 +23,8 @@ The package provides an advanced segmented control widget based on the `TabContr
 
 ![screen-20211007-171939_2](https://user-images.githubusercontent.com/92156712/136547187-fb7eb419-3f18-419f-9ca1-8d25d85b9a44.gif)
 ![screen-20211007-170003_2](https://user-images.githubusercontent.com/92156712/136547191-3fd7ac95-0153-4fad-83d8-e356d7133273.gif)
+![flexible-tabs-example](https://raw.githubusercontent.com/LanarsInc/animated-segmented-tab-control/main/example/assets/flexible_tabs_example.gif)
+![neumorphic-example](https://raw.githubusercontent.com/LanarsInc/animated-segmented-tab-control/main/example/assets/neumorphic_example.gif)
 
 ## Getting started
 
