@@ -21,24 +21,10 @@ Made in [lanars.com](https://lanars.com).
 
 The package provides an advanced segmented control widget based on the `TabController`.
 
-![screen-20211007-171939_2](https://user-images.githubusercontent.com/92156712/136547187-fb7eb419-3f18-419f-9ca1-8d25d85b9a44.gif)
-![screen-20211007-170003_2](https://user-images.githubusercontent.com/92156712/136547191-3fd7ac95-0153-4fad-83d8-e356d7133273.gif)
-
-## Getting started
-
-To use the package, add the dependency to the `pubspec.yaml` file.
-
-```
-dependencies:
-  ...
-  animated_segmented_tab_control: ^1.0.1
-```
-
-And import the library.
-
-```dart
-import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
-```
+<img src="https://user-images.githubusercontent.com/92156712/136547187-fb7eb419-3f18-419f-9ca1-8d25d85b9a44.gif" width="356">
+<img src="https://user-images.githubusercontent.com/92156712/136547191-3fd7ac95-0153-4fad-83d8-e356d7133273.gif" width="356">
+<img src="https://raw.githubusercontent.com/LanarsInc/animated-segmented-tab-control/main/example/assets/neumorphic_example.gif" width="356">
+<img src="https://raw.githubusercontent.com/LanarsInc/animated-segmented-tab-control/main/example/assets/flexible_tabs_example.jpg" width="356">
 
 ## Usage
 
