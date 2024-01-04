@@ -11,6 +11,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme.bodyLarge;
+    final selectedTextStyle = textStyle?.copyWith(fontWeight: FontWeight.bold);
     return MaterialApp(
       // Provide the [TabController]
       home: DefaultTabController(
@@ -31,7 +33,8 @@ class MyApp extends StatelessWidget {
                     squeezeIntensity: 2,
                     height: 45,
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
-                    textStyle: Theme.of(context).textTheme.bodyLarge,
+                    textStyle: textStyle,
+                    selectedTextStyle: selectedTextStyle,
                     // Options for selection
                     // All specified values will override the [SegmentedTabControl] setting
                     tabs: [
@@ -95,8 +98,9 @@ class SampleWidget extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          color: color,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
+        color: color,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+      ),
       child: Text(label),
     );
   }
