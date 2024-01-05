@@ -1,3 +1,7 @@
+## 1.2.1
+
+* Enhancement: Add `selectedTextStyle` parameter
+
 ## 1.2.0
 
 * Enhancement: Add possibility to set different sizes of tabs
