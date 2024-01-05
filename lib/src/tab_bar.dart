@@ -19,6 +19,7 @@ class SegmentedTabControl extends StatelessWidget {
     this.backgroundGradient,
     this.tabTextColor,
     this.textStyle,
+    this.selectedTextStyle,
     this.selectedTabTextColor,
     this.indicatorColor,
     this.indicatorGradient,
@@ -50,8 +51,11 @@ class SegmentedTabControl extends StatelessWidget {
   /// If this is specified, [backgroundColor] has no effect.
   final Gradient? backgroundGradient;
 
-  /// Style of all labels. Color will not applied.
+  /// Style of all labels. Color will not be applied.
   final TextStyle? textStyle;
+
+  /// Style of selected tab label. Color will not be applied.
+  final TextStyle? selectedTextStyle;
 
   /// The color of the text beyond the indicator.
   final Color? tabTextColor;
@@ -61,7 +65,7 @@ class SegmentedTabControl extends StatelessWidget {
 
   /// Color of the indicator.
   final Color? indicatorColor;
-   
+
   /// A gradient to use when filling the box.
   ///
   /// If this is specified, [indicatorColor] has no effect.
@@ -106,6 +110,7 @@ class SegmentedTabControl extends StatelessWidget {
           backgroundGradient: backgroundGradient,
           tabTextColor: tabTextColor,
           textStyle: textStyle,
+          selectedTextStyle: selectedTextStyle,
           selectedTabTextColor: selectedTabTextColor,
           indicatorColor: indicatorColor,
           indicatorGradient: indicatorGradient,
@@ -133,6 +138,7 @@ class _SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget
     this.backgroundGradient,
     this.tabTextColor,
     this.textStyle,
+    this.selectedTextStyle,
     this.selectedTabTextColor,
     this.indicatorColor,
     this.indicatorGradient,
@@ -152,6 +158,7 @@ class _SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget
   final Color? backgroundColor;
   final Gradient? backgroundGradient;
   final TextStyle? textStyle;
+  final TextStyle? selectedTextStyle;
   final Color? tabTextColor;
   final Color? selectedTabTextColor;
   final Color? indicatorColor;
@@ -357,6 +364,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
 
     final textStyle = widget.textStyle ?? Theme.of(context).textTheme.bodyMedium!;
 
+    final selectedTextStyle = widget.selectedTextStyle ?? textStyle;
+
     final selectedTabTextColor =
         currentTab.selectedTextColor ?? widget.selectedTabTextColor ?? Colors.white;
 
@@ -408,6 +417,9 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                       tabs: widget.tabs,
                       currentIndex: _internalIndex,
                       textStyle: textStyle.copyWith(
+                        color: tabTextColor,
+                      ),
+                      selectedTextStyle: selectedTextStyle.copyWith(
                         color: tabTextColor,
                       ),
                       tabPadding: widget.tabPadding,
@@ -464,6 +476,9 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                         tabs: widget.tabs,
                         currentIndex: _internalIndex,
                         textStyle: textStyle.copyWith(
+                          color: selectedTabTextColor,
+                        ),
+                        selectedTextStyle: selectedTextStyle.copyWith(
                           color: selectedTabTextColor,
                         ),
                         tabPadding: widget.tabPadding,
@@ -580,6 +595,7 @@ class _Labels extends StatelessWidget {
     required this.tabs,
     required this.currentIndex,
     required this.textStyle,
+    required this.selectedTextStyle,
     this.radius = const Radius.circular(20),
     this.splashColor,
     this.splashHighlightColor,
@@ -590,6 +606,7 @@ class _Labels extends StatelessWidget {
   final List<SegmentTab> tabs;
   final int currentIndex;
   final TextStyle textStyle;
+  final TextStyle selectedTextStyle;
   final EdgeInsets tabPadding;
   final Radius radius;
   final Color? splashColor;
@@ -617,7 +634,7 @@ class _Labels extends StatelessWidget {
                     child: AnimatedDefaultTextStyle(
                       duration: kTabScrollDuration,
                       curve: Curves.ease,
-                      style: textStyle,
+                      style: (index == currentIndex) ? selectedTextStyle : textStyle,
                       child: Text(
                         tab.label,
                         overflow: TextOverflow.clip,
