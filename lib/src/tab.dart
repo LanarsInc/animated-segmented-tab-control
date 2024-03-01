@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'utils/icons.dart';
+
 /// Selection option for [SegmentedTabControl]
 @immutable
 class SegmentTab {
@@ -14,6 +16,8 @@ class SegmentTab {
     this.splashColor,
     this.splashHighlightColor,
     this.flex = 1,
+    this.iconPosition,
+    this.iconBuilder,
   });
 
   /// This text will be displayed on tab.
@@ -59,4 +63,9 @@ class SegmentTab {
 
   /// Overrides [splashHighlightColor] from [SegmentedTabControl].
   final Color? splashHighlightColor;
+
+  final IconPosition? iconPosition;
+
+  final Widget Function(Color? color)? iconBuilder;
+
 }
