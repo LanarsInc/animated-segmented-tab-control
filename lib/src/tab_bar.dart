@@ -1,5 +1,6 @@
 import 'package:animated_segmented_tab_control/src/utils/double_range.dart';
 import 'package:animated_segmented_tab_control/src/utils/icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
@@ -647,16 +648,18 @@ class _Labels extends StatelessWidget {
                           tab.iconBuilder != null)
                         tab.iconBuilder!(
                             selectedTextStyle.color ?? tab.textColor),
-                      Center(
-                        child: AnimatedDefaultTextStyle(
-                          duration: kTabScrollDuration,
-                          curve: Curves.ease,
-                          style: (index == currentIndex) ? selectedTextStyle : textStyle,
-                          child: Text(
-                            tab.label,
-                            overflow: TextOverflow.clip,
-                            maxLines: 1,
-                            textAlign: TextAlign.center,
+                      Expanded(
+                        child: Center(
+                          child: AnimatedDefaultTextStyle(
+                            duration: kTabScrollDuration,
+                            curve: Curves.ease,
+                            style: (index == currentIndex) ? selectedTextStyle : textStyle,
+                            child: Text(
+                              tab.label,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       ),
