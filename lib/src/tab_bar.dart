@@ -1,4 +1,6 @@
 import 'package:animated_segmented_tab_control/src/utils/double_range.dart';
+import 'package:animated_segmented_tab_control/src/utils/icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
@@ -30,6 +32,7 @@ class SegmentedTabControl extends StatelessWidget {
     this.radius = const Radius.circular(20),
     this.splashColor,
     this.splashHighlightColor,
+    this.indicatorBorder,
   }) : super(key: key);
 
   /// Height of the widget.
@@ -98,6 +101,9 @@ class SegmentedTabControl extends StatelessWidget {
   /// Splash highlight color of options.
   final Color? splashHighlightColor;
 
+  // Indicator border
+  final BoxBorder? indicatorBorder;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -122,6 +128,7 @@ class SegmentedTabControl extends StatelessWidget {
           splashColor: splashColor,
           splashHighlightColor: splashHighlightColor,
           maxWidth: constraints.maxWidth,
+          indicatorBorder: indicatorBorder,
         );
       },
     );
@@ -150,6 +157,7 @@ class _SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget
     this.splashColor,
     this.splashHighlightColor,
     required this.maxWidth,
+    this.indicatorBorder,
   }) : super(key: key);
 
   final double height;
@@ -171,6 +179,7 @@ class _SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget
   final Color? splashColor;
   final Color? splashHighlightColor;
   final double maxWidth;
+  final BoxBorder? indicatorBorder;
 
   @override
   _SegmentedTabControlState createState() => _SegmentedTabControlState();
@@ -446,6 +455,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                             color: indicatorColor,
                             gradient: indicatorGradient,
                             borderRadius: BorderRadius.all(widget.radius),
+                            border: widget.indicatorBorder,
                           ),
                         ),
                       ),
@@ -625,23 +635,39 @@ class _Labels extends StatelessWidget {
               flex: tab.flex,
               child: InkWell(
                 splashColor: tab.splashColor ?? splashColor,
-                highlightColor: tab.splashHighlightColor ?? splashHighlightColor,
+                highlightColor:
+                    tab.splashHighlightColor ?? splashHighlightColor,
                 borderRadius: BorderRadius.all(radius),
                 onTap: callbackBuilder?.call(index),
                 child: Padding(
                   padding: tabPadding,
-                  child: Center(
-                    child: AnimatedDefaultTextStyle(
-                      duration: kTabScrollDuration,
-                      curve: Curves.ease,
-                      style: (index == currentIndex) ? selectedTextStyle : textStyle,
-                      child: Text(
-                        tab.label,
-                        overflow: TextOverflow.clip,
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (tab.iconPosition == IconPosition.left &&
+                          tab.iconBuilder != null)
+                        tab.iconBuilder!(
+                            selectedTextStyle.color ?? tab.textColor),
+                      Expanded(
+                        child: Center(
+                          child: AnimatedDefaultTextStyle(
+                            duration: kTabScrollDuration,
+                            curve: Curves.ease,
+                            style: (index == currentIndex) ? selectedTextStyle : textStyle,
+                            child: Text(
+                              tab.label,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      if (tab.iconPosition == IconPosition.right &&
+                          tab.iconBuilder != null)
+                        tab.iconBuilder!(
+                            selectedTextStyle.color ?? tab.textColor),
+                    ],
                   ),
                 ),
               ),
