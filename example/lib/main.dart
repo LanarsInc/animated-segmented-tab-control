@@ -1,5 +1,4 @@
 import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,7 +13,7 @@ class MyApp extends StatelessWidget {
     final textStyle = Theme.of(context).textTheme.bodyLarge;
     final selectedTextStyle = textStyle?.copyWith(fontWeight: FontWeight.bold);
     return MaterialApp(
-      // Provide the [TabController]
+      // Provides the [TabController]
       home: DefaultTabController(
         length: 3,
         child: Scaffold(
@@ -25,13 +24,10 @@ class MyApp extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: SegmentedTabControl(
                     // Customization of widget
-                    radius: const Radius.circular(3),
-                    backgroundColor: Colors.grey.shade300,
-                    indicatorColor: Colors.orange.shade200,
-                    tabTextColor: Colors.black45,
+                    tabTextColor: Colors.black,
                     selectedTabTextColor: Colors.white,
+                    indicatorPadding: const EdgeInsets.all(4),
                     squeezeIntensity: 2,
-                    height: 45,
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
                     textStyle: textStyle,
                     selectedTextStyle: selectedTextStyle,
@@ -41,15 +37,19 @@ class MyApp extends StatelessWidget {
                       SegmentTab(
                         label: 'ACCOUNT',
                         // For example, this overrides [indicatorColor] from [SegmentedTabControl]
-                        color: Colors.red.shade200,
+                        color: Colors.red.shade300,
+                        backgroundColor: Colors.red.shade100,
                       ),
                       SegmentTab(
                         label: 'HOME',
                         backgroundColor: Colors.blue.shade100,
-                        selectedTextColor: Colors.black45,
-                        textColor: Colors.black26,
+                        color: Colors.blue.shade300,
                       ),
-                      const SegmentTab(label: 'NEW'),
+                      SegmentTab(
+                        label: 'NEW',
+                        backgroundColor: Colors.orange.shade100,
+                        color: Colors.orange.shade300,
+                      ),
                     ],
                   ),
                 ),
@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
                     children: [
                       SampleWidget(
                         label: 'FIRST PAGE',
-                        color: Colors.red.shade200,
+                        color: Colors.red.shade100,
                       ),
                       SampleWidget(
                         label: 'SECOND PAGE',
@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
                       ),
                       SampleWidget(
                         label: 'THIRD PAGE',
-                        color: Colors.orange.shade200,
+                        color: Colors.orange.shade100,
                       ),
                     ],
                   ),
