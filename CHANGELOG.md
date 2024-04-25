@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## 2.0.0
 
 * **Breaking changes**
@@ -9,6 +10,11 @@
       using decorations;
     * the default `SegmentedTabControl.height` is equal to `kTextTabBarHeight` now. 48.0.
 * Fix indicator drag behaviour
+=======
+## 1.2.1
+
+* Enhancement: Add `selectedTextStyle` parameter
+>>>>>>> main
 
 ## 1.2.0
 
