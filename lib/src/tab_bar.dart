@@ -594,17 +594,19 @@ class _Labels extends StatelessWidget {
                 child: Padding(
                   padding: tabPadding,
                   child: Center(
-                    child: AnimatedDefaultTextStyle(
-                      duration: kTabScrollDuration,
-                      curve: Curves.ease,
-                      style: (index == currentIndex) ? selectedTextStyle : textStyle,
-                      child: Text(
-                        tab.label,
-                        overflow: TextOverflow.clip,
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+                    child: tab.labelWidget != null
+                        ? tab.labelWidget!
+                        : AnimatedDefaultTextStyle(
+                            duration: kTabScrollDuration,
+                            curve: Curves.ease,
+                            style: (index == currentIndex) ? selectedTextStyle : textStyle,
+                            child: Text(
+                              tab.label,
+                              overflow: TextOverflow.clip,
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
                   ),
                 ),
               ),

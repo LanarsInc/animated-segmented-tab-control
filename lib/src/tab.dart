@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class SegmentTab {
   const SegmentTab({
     required this.label,
+    this.labelWidget,
     this.color,
     this.gradient,
     this.selectedTextColor,
@@ -16,8 +17,11 @@ class SegmentTab {
     this.flex = 1,
   });
 
-  /// This text will be displayed on tab.
+  /// Text label used when [labelWidget] is null.
   final String label;
+
+  /// Custom widget for the tab label. If non-null, it overrides [label].
+  final Widget? labelWidget;
 
   /// Tab flex factor
   final int flex;
