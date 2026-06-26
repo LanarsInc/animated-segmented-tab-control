@@ -539,7 +539,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     final unitsPerSecond = Offset(unitsPerSecondX, 0);
     final unitVelocity = unitsPerSecond.distance;
 
-    const spring = SpringDescription(mass: 30, stiffness: 1, damping: 1);
+    const spring = SpringDescription(mass: 1, stiffness: 225.03305555555556, damping: 30);
 
     final simulation = SpringSimulation(spring, 0, 1, -unitVelocity);
 
