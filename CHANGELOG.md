@@ -1,3 +1,6 @@
+## 2.0.1
+* Fix indicator getting stuck after releasing a slow drag on the selected tab (Flutter >= 3.32.0)
+
 ## 2.0.0
 * **Breaking changes**
     * `SegmentedTabControl.backgroundColor` and `SegmentedTabControl.backgroundGradient` params replaced with `barDecoration` so you gain more
