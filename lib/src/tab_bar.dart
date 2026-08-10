@@ -201,6 +201,10 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
 
   @override
   void dispose() {
+    if (_controllerIsValid) {
+      _controller!.animation!.removeListener(_handleTabControllerAnimationTick);
+    }
+    _controller = null;
     _internalAnimationController.removeListener(_handleInternalAnimationTick);
     _internalAnimationController.dispose();
     super.dispose();
