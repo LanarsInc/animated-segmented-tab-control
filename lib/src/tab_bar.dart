@@ -1,4 +1,5 @@
 import 'package:animated_segmented_tab_control/src/utils/double_range.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
@@ -115,7 +116,8 @@ class SegmentedTabControl extends StatelessWidget {
   }
 }
 
-class _SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget {
+class _SegmentedTabControl extends StatefulWidget
+    implements PreferredSizeWidget {
   const _SegmentedTabControl({
     super.key,
     required this.height,
@@ -170,10 +172,13 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
 
   int _totalFlex = 0;
 
-  double _maxWidth = 0;
-
+  /// Cumulative width fractions of the tabs, in range 0..1.
   List<double> flexFactors = [];
 
+  /// Indicator travel range of each tab, as a fraction of the available width.
+  ///
+  /// Stored as fractions rather than pixels so the ranges stay valid when the
+  /// available width changes, e.g. on device rotation.
   List<DoubleRange> alignmentXRanges = [];
 
   bool get _controllerIsValid => _controller?.animation != null;
@@ -183,11 +188,9 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
   @override
   void initState() {
     super.initState();
-    _maxWidth = widget.maxWidth;
     _internalAnimationController = AnimationController(vsync: this);
     _internalAnimationController.addListener(_handleInternalAnimationTick);
-    _calculateTotalFlex();
-    _calculateFlexFactors();
+    _recalculateGeometry();
   }
 
   void _handleInternalAnimationTick() {
@@ -209,11 +212,22 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     super.didChangeDependencies();
   }
 
+  /// Recomputes everything derived from [_SegmentedTabControl.tabs].
+  ///
+  /// None of it depends on the available width, so a resize does not need it.
+  void _recalculateGeometry() {
+    _calculateTotalFlex();
+    _calculateFlexFactors();
+    _calculateTabIndicatorAlignmentRanges();
+  }
+
   void _calculateTotalFlex() {
-    _totalFlex = widget.tabs.fold(0, (previousValue, tab) => previousValue + tab.flex);
+    _totalFlex =
+        widget.tabs.fold(0, (previousValue, tab) => previousValue + tab.flex);
   }
 
   void _calculateFlexFactors() {
+    flexFactors.clear();
     int collectedFlex = 0;
     for (int i = 0; i < widget.tabs.length; i++) {
       collectedFlex += widget.tabs[i].flex;
@@ -224,15 +238,29 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
   @override
   void didUpdateWidget(_SegmentedTabControl oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (!listEquals(widget.tabs, oldWidget.tabs)) {
+      _recalculateGeometry();
+
+      if (_internalIndex > widget.tabs.length - 1) {
+        _internalIndex = widget.tabs.length - 1;
+      }
+
+      // Stop the running animation first, otherwise its next tick overwrites
+      // the alignment with a value derived from the previous geometry.
+      _internalAnimationController.stop();
+      _currentIndicatorAlignment =
+          _animationValueToAlignment(_internalIndex.toDouble());
+    }
+
     if (widget.controller != oldWidget.controller) {
-      _calculateTotalFlex();
-      _calculateFlexFactors();
       _updateTabController();
     }
   }
 
   void _updateTabController() {
-    final TabController? newController = widget.controller ?? DefaultTabController.of(context);
+    final TabController? newController =
+        widget.controller ?? DefaultTabController.of(context);
     assert(() {
       if (newController == null) {
         throw FlutterError(
@@ -246,6 +274,12 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
       return true;
     }());
 
+    assert(
+      newController == null || newController.length == widget.tabs.length,
+      'The number of tabs (${widget.tabs.length}) must match the length of the '
+      'TabController (${newController.length}).',
+    );
+
     if (newController == _controller) {
       return;
     }
@@ -255,11 +289,11 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     }
 
     _controller = newController;
-    _calculateTabIndicatorAlignmentRanges();
 
     if (_controller != null) {
       _controller!.animation!.addListener(_handleTabControllerAnimationTick);
-      _currentIndicatorAlignment = _animationValueToAlignment(_controller!.index.toDouble());
+      _currentIndicatorAlignment =
+          _animationValueToAlignment(_controller!.index.toDouble());
     }
   }
 
@@ -268,30 +302,41 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     _animateIndicatorTo(_animationValueToAlignment(currentValue));
   }
 
+  /// Fills [alignmentXRanges] from the tab flexes alone.
+  ///
+  /// The asymmetric branch handles a next tab narrower than the current one, so
+  /// the indicator's midpoint interpolation stays visually centred while it
+  /// resizes.
   void _calculateTabIndicatorAlignmentRanges() {
-    double computedWidth = 0;
-    double alignmentStartX = 0;
+    alignmentXRanges.clear();
 
-    for (int index = 0; index < _controller!.length - 1; index++) {
-      final tab = widget.tabs[index];
-      final nextTab = widget.tabs[index + 1];
+    double computedWidthFraction = 0;
+    double alignmentStartXFraction = 0;
 
-      final tabWidth = (tab.flex / _totalFlex) * _maxWidth;
-      final nextTabWidth = (nextTab.flex / _totalFlex) * _maxWidth;
+    for (int index = 0; index < widget.tabs.length - 1; index++) {
+      final tabWidthFraction = widget.tabs[index].flex / _totalFlex;
+      final nextTabWidthFraction = widget.tabs[index + 1].flex / _totalFlex;
 
-      if (nextTabWidth >= tabWidth) {
-        final alignmentEndX = computedWidth + (tabWidth / 2);
-        alignmentXRanges.add(DoubleRange(alignmentStartX, alignmentEndX));
-        alignmentStartX = alignmentEndX;
+      if (nextTabWidthFraction >= tabWidthFraction) {
+        final alignmentEndXFraction =
+            computedWidthFraction + (tabWidthFraction / 2);
+        alignmentXRanges
+            .add(DoubleRange(alignmentStartXFraction, alignmentEndXFraction));
+        alignmentStartXFraction = alignmentEndXFraction;
       } else {
-        final controlPoint = computedWidth + (nextTabWidth / 2);
-        alignmentXRanges.add(DoubleRange(alignmentStartX, controlPoint));
-        alignmentStartX = computedWidth + tabWidth - (nextTabWidth / 2);
+        final controlPointFraction =
+            computedWidthFraction + (nextTabWidthFraction / 2);
+        alignmentXRanges
+            .add(DoubleRange(alignmentStartXFraction, controlPointFraction));
+        alignmentStartXFraction = computedWidthFraction +
+            tabWidthFraction -
+            (nextTabWidthFraction / 2);
       }
 
-      computedWidth += tabWidth;
+      computedWidthFraction += tabWidthFraction;
     }
-    alignmentXRanges.add(DoubleRange(alignmentStartX, computedWidth));
+    alignmentXRanges
+        .add(DoubleRange(alignmentStartXFraction, computedWidthFraction));
   }
 
   Alignment _animationValueToAlignment(double? value) {
@@ -307,25 +352,29 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     return _calculateAlignmentFromTarget(x, index);
   }
 
+  /// Returns the indicator's left edge as a fraction of the available width.
   double _calculateTarget(double reminder, int index) {
-    final tabLeftX = index > 0 ? flexFactors[index - 1] * _maxWidth : 0;
+    final tabLeftXFraction = index > 0 ? flexFactors[index - 1] : 0.0;
     double target;
     if (reminder > 0) {
-      target = tabLeftX + ((reminder * 2) * (alignmentXRanges[index].endInclusive - tabLeftX));
+      target = tabLeftXFraction +
+          ((reminder * 2) *
+              (alignmentXRanges[index].endInclusive - tabLeftXFraction));
     } else {
-      target = tabLeftX + ((reminder * 2) * (tabLeftX - alignmentXRanges[index].start));
+      target = tabLeftXFraction +
+          ((reminder * 2) * (tabLeftXFraction - alignmentXRanges[index].start));
     }
 
     return target;
   }
 
-  Alignment _calculateAlignmentFromTarget(double position, int index) {
-    final tabWidth = (widget.tabs[index].flex / _totalFlex) * _maxWidth;
-    final currentTabHalfWidth = tabWidth / 2;
-    final halfMaxWidth = _maxWidth / 2;
+  /// Converts an indicator left edge in 0..1 fractions of the available width to
+  /// an [Alignment] in range -1..1.
+  Alignment _calculateAlignmentFromTarget(double positionFraction, int index) {
+    final halfTabWidthFraction = (widget.tabs[index].flex / _totalFlex) / 2;
 
-    final x =
-        (position - halfMaxWidth + currentTabHalfWidth) / (halfMaxWidth - currentTabHalfWidth);
+    final x = (positionFraction - 0.5 + halfTabWidthFraction) /
+        (0.5 - halfTabWidthFraction);
 
     return Alignment(x, 0);
   }
@@ -343,25 +392,31 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
   Widget build(BuildContext context) {
     final currentTab = widget.tabs[_internalIndex];
 
-    final textStyle = widget.textStyle ?? Theme.of(context).textTheme.bodyMedium!;
+    final textStyle =
+        widget.textStyle ?? Theme.of(context).textTheme.bodyMedium!;
 
     final selectedTextStyle = widget.selectedTextStyle ?? textStyle;
 
-    final selectedTabTextColor =
-        currentTab.selectedTextColor ?? widget.selectedTabTextColor ?? Colors.white;
+    final selectedTabTextColor = currentTab.selectedTextColor ??
+        widget.selectedTabTextColor ??
+        Colors.white;
 
-    final tabTextColor =
-        currentTab.textColor ?? widget.tabTextColor ?? Colors.white.withOpacity(0.7);
+    final tabTextColor = currentTab.textColor ??
+        widget.tabTextColor ??
+        Colors.white.withOpacity(0.7);
 
     return DefaultTextStyle(
       style: widget.textStyle ?? DefaultTextStyle.of(context).style,
       child: LayoutBuilder(
         builder: (context, _) {
-          final indicatorWidth = ((_maxWidth - widget.indicatorPadding.horizontal) / _totalFlex) *
-              widget.tabs[_internalIndex].flex;
+          final indicatorWidth =
+              ((widget.maxWidth - widget.indicatorPadding.horizontal) /
+                      _totalFlex) *
+                  widget.tabs[_internalIndex].flex;
 
           return ClipRRect(
-            borderRadius: widget.barDecoration?.borderRadius ?? BorderRadius.zero,
+            borderRadius:
+                widget.barDecoration?.borderRadius ?? BorderRadius.zero,
             child: SizedBox(
               height: widget.height,
               child: Stack(
@@ -396,8 +451,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                     alignment: _currentIndicatorAlignment,
                     child: GestureDetector(
                       onPanDown: _onPanDown(),
-                      onPanUpdate: _onPanUpdate(_maxWidth),
-                      onPanEnd: _onPanEnd(_maxWidth),
+                      onPanUpdate: _onPanUpdate(widget.maxWidth),
+                      onPanEnd: _onPanEnd(widget.maxWidth),
                       child: Padding(
                         padding: widget.indicatorPadding,
                         child: _SqueezeAnimated(
@@ -407,7 +462,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                             duration: kTabScrollDuration,
                             curve: Curves.ease,
                             width: indicatorWidth,
-                            height: widget.height - widget.indicatorPadding.vertical,
+                            height: widget.height -
+                                widget.indicatorPadding.vertical,
                             decoration: widget.indicatorDecoration?.copyWith(
                               color: currentTab.color,
                               gradient: currentTab.gradient,
@@ -430,7 +486,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                         ),
                         offset: Offset(
                           _xToPercentsCoefficient(_currentIndicatorAlignment) *
-                              (_maxWidth - indicatorWidth),
+                              (widget.maxWidth - indicatorWidth),
                           0,
                         ),
                       ),
@@ -478,7 +534,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     return (details) {
       _internalAnimationController.stop();
       setState(() {
-        _currentTilePadding = EdgeInsets.symmetric(vertical: widget.squeezeIntensity);
+        _currentTilePadding =
+            EdgeInsets.symmetric(vertical: widget.squeezeIntensity);
       });
     };
   }
@@ -488,7 +545,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
       return null;
     }
     return (details) {
-      double x = _currentIndicatorAlignment.x + details.delta.dx / (maxWidth / widget.tabs.length);
+      double x = _currentIndicatorAlignment.x +
+          details.delta.dx / (maxWidth / widget.tabs.length);
       if (x < -1) {
         x = -1;
       } else if (x > 1) {
@@ -503,9 +561,11 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
 
   int _alignmentToIndex(Alignment alignment) {
     final currentPosition = _xToPercentsCoefficient(alignment);
-    final roundedCurrentPosition = num.parse(currentPosition.toStringAsFixed(2));
+    final roundedCurrentPosition =
+        num.parse(currentPosition.toStringAsFixed(2));
 
-    final index = flexFactors.indexWhere((flexFactor) => roundedCurrentPosition <= flexFactor);
+    final index = flexFactors
+        .indexWhere((flexFactor) => roundedCurrentPosition <= flexFactor);
 
     return index == -1 ? _controller!.length - 1 : index;
   }
@@ -528,7 +588,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     };
   }
 
-  TickerFuture _animateIndicatorToNearest(Offset pixelsPerSecond, double width) {
+  TickerFuture _animateIndicatorToNearest(
+      Offset pixelsPerSecond, double width) {
     final nearest = _internalIndex;
     final target = _animationValueToAlignment(nearest.toDouble());
     _internalAnimation = _internalAnimationController.drive(AlignmentTween(
@@ -539,7 +600,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     final unitsPerSecond = Offset(unitsPerSecondX, 0);
     final unitVelocity = unitsPerSecond.distance;
 
-    const spring = SpringDescription(mass: 1, stiffness: 225.03305555555556, damping: 30);
+    const spring =
+        SpringDescription(mass: 1, stiffness: 225.03305555555556, damping: 30);
 
     final simulation = SpringSimulation(spring, 0, 1, -unitVelocity);
 
@@ -588,7 +650,8 @@ class _Labels extends StatelessWidget {
               flex: tab.flex,
               child: InkWell(
                 splashColor: tab.splashColor ?? splashColor,
-                highlightColor: tab.splashHighlightColor ?? splashHighlightColor,
+                highlightColor:
+                    tab.splashHighlightColor ?? splashHighlightColor,
                 borderRadius: radius as BorderRadius?,
                 onTap: callbackBuilder?.call(index),
                 child: Padding(
@@ -597,7 +660,9 @@ class _Labels extends StatelessWidget {
                     child: AnimatedDefaultTextStyle(
                       duration: kTabScrollDuration,
                       curve: Curves.ease,
-                      style: (index == currentIndex) ? selectedTextStyle : textStyle,
+                      style: (index == currentIndex)
+                          ? selectedTextStyle
+                          : textStyle,
                       child: Text(
                         tab.label,
                         overflow: TextOverflow.clip,
