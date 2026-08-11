@@ -497,19 +497,18 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                         ),
                       ),
                       child: IgnorePointer(
-                        child: _Labels(
-                          radius: widget.indicatorDecoration?.borderRadius,
-                          splashColor: widget.splashColor,
-                          splashHighlightColor: widget.splashHighlightColor,
-                          tabs: widget.tabs,
-                          currentIndex: _internalIndex,
-                          textStyle: textStyle.copyWith(
-                            color: selectedTabTextColor,
+                        child: ExcludeSemantics(
+                          child: _Labels(
+                            tabs: widget.tabs,
+                            currentIndex: _internalIndex,
+                            textStyle: textStyle.copyWith(
+                              color: selectedTabTextColor,
+                            ),
+                            selectedTextStyle: selectedTextStyle.copyWith(
+                              color: selectedTabTextColor,
+                            ),
+                            tabPadding: widget.tabPadding,
                           ),
-                          selectedTextStyle: selectedTextStyle.copyWith(
-                            color: selectedTabTextColor,
-                          ),
-                          tabPadding: widget.tabPadding,
                         ),
                       ),
                     ),
@@ -692,6 +691,8 @@ class _Labels extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final callbackBuilder = this.callbackBuilder;
+
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -699,33 +700,37 @@ class _Labels extends StatelessWidget {
           tabs.length,
           (index) {
             final tab = tabs[index];
-            return Flexible(
-              flex: tab.flex,
-              child: InkWell(
-                splashColor: tab.splashColor ?? splashColor,
-                highlightColor:
-                    tab.splashHighlightColor ?? splashHighlightColor,
-                borderRadius: radius as BorderRadius?,
-                onTap: callbackBuilder?.call(index),
-                child: Padding(
-                  padding: tabPadding,
-                  child: Center(
-                    child: AnimatedDefaultTextStyle(
-                      duration: kTabScrollDuration,
-                      curve: Curves.ease,
-                      style: (index == currentIndex)
-                          ? selectedTextStyle
-                          : textStyle,
-                      child: Text(
-                        tab.label,
-                        overflow: TextOverflow.clip,
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+
+            final content = Padding(
+              padding: tabPadding,
+              child: Center(
+                child: AnimatedDefaultTextStyle(
+                  duration: kTabScrollDuration,
+                  curve: Curves.ease,
+                  style:
+                      (index == currentIndex) ? selectedTextStyle : textStyle,
+                  child: Text(
+                    tab.label,
+                    overflow: TextOverflow.clip,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
+            );
+
+            return Flexible(
+              flex: tab.flex,
+              child: callbackBuilder == null
+                  ? content
+                  : InkWell(
+                      splashColor: tab.splashColor ?? splashColor,
+                      highlightColor:
+                          tab.splashHighlightColor ?? splashHighlightColor,
+                      borderRadius: radius as BorderRadius?,
+                      onTap: callbackBuilder(index),
+                      child: content,
+                    ),
             );
           },
         ),
