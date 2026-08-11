@@ -59,4 +59,37 @@ class SegmentTab {
 
   /// Overrides [splashHighlightColor] from [SegmentedTabControl].
   final Color? splashHighlightColor;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other is SegmentTab &&
+        other.label == label &&
+        other.flex == flex &&
+        other.color == color &&
+        other.gradient == gradient &&
+        other.selectedTextColor == selectedTextColor &&
+        other.backgroundColor == backgroundColor &&
+        other.backgroundGradient == backgroundGradient &&
+        other.textColor == textColor &&
+        other.splashColor == splashColor &&
+        other.splashHighlightColor == splashHighlightColor;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        label,
+        flex,
+        color,
+        gradient,
+        selectedTextColor,
+        backgroundColor,
+        backgroundGradient,
+        textColor,
+        splashColor,
+        splashHighlightColor,
+      );
 }
