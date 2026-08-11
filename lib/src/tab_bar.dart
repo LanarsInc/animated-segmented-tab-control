@@ -428,9 +428,10 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                   AnimatedContainer(
                     duration: kTabScrollDuration,
                     curve: Curves.ease,
-                    decoration: widget.barDecoration?.copyWith(
-                      color: currentTab.backgroundColor,
-                      gradient: currentTab.backgroundGradient,
+                    decoration: _resolveBackground(
+                      widget.barDecoration,
+                      currentTab.backgroundColor,
+                      currentTab.backgroundGradient,
                     ),
                     child: Material(
                       color: Colors.transparent,
@@ -468,9 +469,10 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                             width: indicatorWidth,
                             height: widget.height -
                                 widget.indicatorPadding.vertical,
-                            decoration: widget.indicatorDecoration?.copyWith(
-                              color: currentTab.color,
-                              gradient: currentTab.gradient,
+                            decoration: _resolveBackground(
+                              widget.indicatorDecoration,
+                              currentTab.color,
+                              currentTab.gradient,
                             ),
                           ),
                         ),
@@ -518,6 +520,53 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
           );
         },
       ),
+    );
+  }
+
+  /// Applies a tab's [tabColor] / [tabGradient] override to [base]'s background.
+  ///
+  /// Colour and gradient are resolved as a *pair*: if the tab specifies either
+  /// one, it replaces both.
+  BoxDecoration? _resolveBackground(
+    BoxDecoration? base,
+    Color? tabColor,
+    Gradient? tabGradient,
+  ) {
+    if (tabColor == null && tabGradient == null) return base;
+
+    final baseGradient = base?.gradient;
+
+    final Gradient? gradient;
+    if (tabGradient != null) {
+      gradient = tabGradient;
+    } else if (tabColor != null && baseGradient != null) {
+      gradient = baseGradient is LinearGradient
+          ? LinearGradient(
+              begin: baseGradient.begin,
+              end: baseGradient.end,
+              transform: baseGradient.transform,
+              colors: [tabColor, tabColor],
+            )
+          : LinearGradient(colors: [tabColor, tabColor]);
+    } else {
+      gradient = null;
+    }
+
+    final color = gradient == null ? tabColor : null;
+
+    if (base == null) {
+      return BoxDecoration(color: color, gradient: gradient);
+    }
+
+    return BoxDecoration(
+      color: color,
+      gradient: gradient,
+      image: base.image,
+      border: base.border,
+      borderRadius: base.borderRadius,
+      boxShadow: base.boxShadow,
+      backgroundBlendMode: base.backgroundBlendMode,
+      shape: base.shape,
     );
   }
 
