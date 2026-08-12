@@ -38,7 +38,7 @@ class SegmentedTabControl extends StatelessWidget {
 
   /// Height of the widget.
   ///
-  /// [preferredSize] returns this value.
+  /// Defaults to [kTextTabBarHeight], the height of a [TabBar].
   final double height;
 
   /// Selection options.
@@ -47,10 +47,16 @@ class SegmentedTabControl extends StatelessWidget {
   /// Can be provided by [DefaultTabController].
   final TabController? controller;
 
-  /// Style of all labels. Color will not be applied.
+  /// Default style of all labels.
+  ///
+  /// Its color is replaced by [tabTextColor] or [selectedTabTextColor], whichever
+  /// applies to the label layer being painted.
   final TextStyle? textStyle;
 
-  /// Style of selected tab label. Color will not be applied.
+  /// Style of the selected tab's label, on top of [textStyle].
+  ///
+  /// Applies to the selected tab in *both* label layers, so it changes weight or
+  /// size inside and outside the indicator.
   final TextStyle? selectedTextStyle;
 
   /// The color of the text beyond the indicator.
@@ -71,7 +77,12 @@ class SegmentedTabControl extends StatelessWidget {
   /// take your finger off the indicator.
   final Duration squeezeDuration;
 
-  /// Only vertical padding will be applied.
+  /// Padding around the indicator.
+  ///
+  /// Only the vertical component is supported. Horizontal padding does narrow
+  /// the indicator, but it is not applied to the clip that reveals the
+  /// highlighted labels, so the highlight drifts out of alignment with the
+  /// indicator. Use [tabPadding] to inset the labels instead.
   final EdgeInsets indicatorPadding;
 
   /// Padding of labels.
@@ -428,9 +439,10 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                   AnimatedContainer(
                     duration: kTabScrollDuration,
                     curve: Curves.ease,
-                    decoration: widget.barDecoration?.copyWith(
-                      color: currentTab.backgroundColor,
-                      gradient: currentTab.backgroundGradient,
+                    decoration: _resolveBackground(
+                      widget.barDecoration,
+                      currentTab.backgroundColor,
+                      currentTab.backgroundGradient,
                     ),
                     child: Material(
                       color: Colors.transparent,
@@ -468,9 +480,10 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                             width: indicatorWidth,
                             height: widget.height -
                                 widget.indicatorPadding.vertical,
-                            decoration: widget.indicatorDecoration?.copyWith(
-                              color: currentTab.color,
-                              gradient: currentTab.gradient,
+                            decoration: _resolveBackground(
+                              widget.indicatorDecoration,
+                              currentTab.color,
+                              currentTab.gradient,
                             ),
                           ),
                         ),
@@ -495,19 +508,18 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                         ),
                       ),
                       child: IgnorePointer(
-                        child: _Labels(
-                          radius: widget.indicatorDecoration?.borderRadius,
-                          splashColor: widget.splashColor,
-                          splashHighlightColor: widget.splashHighlightColor,
-                          tabs: widget.tabs,
-                          currentIndex: _internalIndex,
-                          textStyle: textStyle.copyWith(
-                            color: selectedTabTextColor,
+                        child: ExcludeSemantics(
+                          child: _Labels(
+                            tabs: widget.tabs,
+                            currentIndex: _internalIndex,
+                            textStyle: textStyle.copyWith(
+                              color: selectedTabTextColor,
+                            ),
+                            selectedTextStyle: selectedTextStyle.copyWith(
+                              color: selectedTabTextColor,
+                            ),
+                            tabPadding: widget.tabPadding,
                           ),
-                          selectedTextStyle: selectedTextStyle.copyWith(
-                            color: selectedTabTextColor,
-                          ),
-                          tabPadding: widget.tabPadding,
                         ),
                       ),
                     ),
@@ -518,6 +530,53 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
           );
         },
       ),
+    );
+  }
+
+  /// Applies a tab's [tabColor] / [tabGradient] override to [base]'s background.
+  ///
+  /// Colour and gradient are resolved as a *pair*: if the tab specifies either
+  /// one, it replaces both.
+  BoxDecoration? _resolveBackground(
+    BoxDecoration? base,
+    Color? tabColor,
+    Gradient? tabGradient,
+  ) {
+    if (tabColor == null && tabGradient == null) return base;
+
+    final baseGradient = base?.gradient;
+
+    final Gradient? gradient;
+    if (tabGradient != null) {
+      gradient = tabGradient;
+    } else if (tabColor != null && baseGradient != null) {
+      gradient = baseGradient is LinearGradient
+          ? LinearGradient(
+              begin: baseGradient.begin,
+              end: baseGradient.end,
+              transform: baseGradient.transform,
+              colors: [tabColor, tabColor],
+            )
+          : LinearGradient(colors: [tabColor, tabColor]);
+    } else {
+      gradient = null;
+    }
+
+    final color = gradient == null ? tabColor : null;
+
+    if (base == null) {
+      return BoxDecoration(color: color, gradient: gradient);
+    }
+
+    return BoxDecoration(
+      color: color,
+      gradient: gradient,
+      image: base.image,
+      border: base.border,
+      borderRadius: base.borderRadius,
+      boxShadow: base.boxShadow,
+      backgroundBlendMode: base.backgroundBlendMode,
+      shape: base.shape,
     );
   }
 
@@ -643,6 +702,8 @@ class _Labels extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final callbackBuilder = this.callbackBuilder;
+
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -650,33 +711,37 @@ class _Labels extends StatelessWidget {
           tabs.length,
           (index) {
             final tab = tabs[index];
-            return Flexible(
-              flex: tab.flex,
-              child: InkWell(
-                splashColor: tab.splashColor ?? splashColor,
-                highlightColor:
-                    tab.splashHighlightColor ?? splashHighlightColor,
-                borderRadius: radius as BorderRadius?,
-                onTap: callbackBuilder?.call(index),
-                child: Padding(
-                  padding: tabPadding,
-                  child: Center(
-                    child: AnimatedDefaultTextStyle(
-                      duration: kTabScrollDuration,
-                      curve: Curves.ease,
-                      style: (index == currentIndex)
-                          ? selectedTextStyle
-                          : textStyle,
-                      child: Text(
-                        tab.label,
-                        overflow: TextOverflow.clip,
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+
+            final content = Padding(
+              padding: tabPadding,
+              child: Center(
+                child: AnimatedDefaultTextStyle(
+                  duration: kTabScrollDuration,
+                  curve: Curves.ease,
+                  style:
+                      (index == currentIndex) ? selectedTextStyle : textStyle,
+                  child: Text(
+                    tab.label,
+                    overflow: TextOverflow.clip,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
+            );
+
+            return Flexible(
+              flex: tab.flex,
+              child: callbackBuilder == null
+                  ? content
+                  : InkWell(
+                      splashColor: tab.splashColor ?? splashColor,
+                      highlightColor:
+                          tab.splashHighlightColor ?? splashHighlightColor,
+                      borderRadius: radius as BorderRadius?,
+                      onTap: callbackBuilder(index),
+                      child: content,
+                    ),
             );
           },
         ),

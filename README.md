@@ -34,7 +34,7 @@ The package contains a `SegmentedTabControl` widget that requires a `SegmentTab`
 SegmentedTabControl(
   tabs: [
     SegmentTab(
-      label: "Home".
+      label: 'Home',
     ),
   ],
 )
@@ -48,22 +48,29 @@ DefaultTabController(
   child: SegmentedTabControl(
     tabs: [
       SegmentTab(
-        label: "Home",
+        label: 'Home',
       ),
       SegmentTab(
-        label: "Account",
+        label: 'Account',
       ),
     ],
-  )
+  ),
 )
 ```
 
-You can change the entire widget or an individual tab. Or combine it. All provided values in the `SegmentedTabControl` will be replaced with values from each tab.
+You can style the whole widget, an individual tab, or both. A value on the currently selected `SegmentTab`
+overrides the corresponding value on `SegmentedTabControl`.
 
 ```dart
 SegmentedTabControl(
-  backgroundColor: Colors.grey.shade300,
-  indicatorColor: Colors.orange.shade200,
+  barDecoration: BoxDecoration(
+    color: Colors.grey.shade300,
+    borderRadius: BorderRadius.circular(10),
+  ),
+  indicatorDecoration: BoxDecoration(
+    color: Colors.orange.shade200,
+    borderRadius: BorderRadius.circular(10),
+  ),
   tabTextColor: Colors.black45,
   selectedTabTextColor: Colors.white,
   tabs: [
@@ -79,8 +86,12 @@ SegmentedTabControl(
     ),
     const SegmentTab(label: 'NEW'),
   ],
-),
+)
 ```
+
+Note that the text colors are read from the *selected* tab and applied to the whole bar, so
+`textColor` and `selectedTextColor` set the bar's label colors while that tab is selected rather than
+coloring only that one tab.
 
 Change tracking logic is identical to TabBar logic.
 

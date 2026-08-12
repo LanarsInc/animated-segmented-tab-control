@@ -31,12 +31,14 @@ class MyApp extends StatelessWidget {
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
                     textStyle: textStyle,
                     selectedTextStyle: selectedTextStyle,
+                    barDecoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                    indicatorDecoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(10)),
                     // Options for selection
-                    // All specified values will override the [SegmentedTabControl] setting
                     tabs: [
                       SegmentTab(
                         label: 'ACCOUNT',
-                        // For example, this overrides [indicatorColor] from [SegmentedTabControl]
                         color: Colors.red.shade300,
                         backgroundColor: Colors.red.shade100,
                       ),
