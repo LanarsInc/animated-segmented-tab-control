@@ -38,7 +38,7 @@ class SegmentedTabControl extends StatelessWidget {
 
   /// Height of the widget.
   ///
-  /// [preferredSize] returns this value.
+  /// Defaults to [kTextTabBarHeight], the height of a [TabBar].
   final double height;
 
   /// Selection options.
@@ -47,10 +47,16 @@ class SegmentedTabControl extends StatelessWidget {
   /// Can be provided by [DefaultTabController].
   final TabController? controller;
 
-  /// Style of all labels. Color will not be applied.
+  /// Default style of all labels.
+  ///
+  /// Its color is replaced by [tabTextColor] or [selectedTabTextColor], whichever
+  /// applies to the label layer being painted.
   final TextStyle? textStyle;
 
-  /// Style of selected tab label. Color will not be applied.
+  /// Style of the selected tab's label, on top of [textStyle].
+  ///
+  /// Applies to the selected tab in *both* label layers, so it changes weight or
+  /// size inside and outside the indicator.
   final TextStyle? selectedTextStyle;
 
   /// The color of the text beyond the indicator.
@@ -71,7 +77,12 @@ class SegmentedTabControl extends StatelessWidget {
   /// take your finger off the indicator.
   final Duration squeezeDuration;
 
-  /// Only vertical padding will be applied.
+  /// Padding around the indicator.
+  ///
+  /// Only the vertical component is supported. Horizontal padding does narrow
+  /// the indicator, but it is not applied to the clip that reveals the
+  /// highlighted labels, so the highlight drifts out of alignment with the
+  /// indicator. Use [tabPadding] to inset the labels instead.
   final EdgeInsets indicatorPadding;
 
   /// Padding of labels.

@@ -22,36 +22,42 @@ class SegmentTab {
   /// Tab flex factor
   final int flex;
 
-  /// Indicator color when this option is selected.
+  /// Indicator color while this option is selected.
   ///
-  /// Overrides [indicatorColor] from [SegmentedTabControl].
+  /// Overrides the color and the gradient of
+  /// [SegmentedTabControl.indicatorDecoration].
+  ///
+  /// If [gradient] is also specified, [color] has no effect.
   final Color? color;
 
-  /// Indicator gradient when this option is selected.
+  /// Indicator gradient while this option is selected.
   ///
-  /// Overrides [indicatorGradient] from [SegmentedTabControl].
-  /// If this is specified, [color] has no effect.
+  /// Overrides the color and the gradient of
+  /// [SegmentedTabControl.indicatorDecoration],
+  /// and takes precedence over [color].
   final Gradient? gradient;
 
-  /// Text color when this option is selected.
+  /// Color of the label inside the indicator while this option is selected.
   ///
-  /// Overrides [selectedTabTextColor] from [SegmentedTabControl].
+  /// Overrides [SegmentedTabControl.selectedTabTextColor].
   final Color? selectedTextColor;
 
-  /// [SegmentedTabControl] color when this option is selected.
+  /// Bar color while this option is selected.
   ///
-  /// Overrides [backgroundColor] from [SegmentedTabControl].
+  /// Overrides the color and the gradient of
+  /// [SegmentedTabControl.barDecoration].
   final Color? backgroundColor;
 
-  /// [SegmentedTabControl] background gradient when this option is selected.
+  /// Bar gradient while this option is selected.
   ///
-  /// Overrides [backgroundGradient] from [SegmentedTabControl].
-  /// If this is specified, [backgroundColor] has no effect.
+  /// Overrides the color and the gradient of
+  /// [SegmentedTabControl.barDecoration],
+  /// and takes precedence over [backgroundColor].
   final Gradient? backgroundGradient;
 
-  /// Text color when this option is selected.
+  /// Color of the labels outside the indicator while this option is selected.
   ///
-  /// Overrides [tabTextColor] from [SegmentedTabControl].
+  /// Overrides [SegmentedTabControl.tabTextColor].
   final Color? textColor;
 
   /// Overrides [splashColor] from [SegmentedTabControl].
