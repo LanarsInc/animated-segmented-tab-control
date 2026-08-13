@@ -180,7 +180,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
   late AnimationController _internalAnimationController;
   late Animation<Alignment> _internalAnimation;
   TabController? _controller;
-
+  TextDirection _textDirection = TextDirection.ltr;
   int _totalFlex = 0;
 
   /// Cumulative width fractions of the tabs, in range 0..1.
@@ -193,6 +193,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
   List<DoubleRange> alignmentXRanges = [];
 
   bool get _controllerIsValid => _controller?.animation != null;
+
+  bool get _isRTL => _textDirection == TextDirection.rtl;
 
   int _internalIndex = 0;
 
@@ -223,6 +225,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
 
   @override
   void didChangeDependencies() {
+    _textDirection = Directionality.of(context);
     _updateTabController();
     super.didChangeDependencies();
   }
@@ -352,6 +355,17 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     }
     alignmentXRanges
         .add(DoubleRange(alignmentStartXFraction, computedWidthFraction));
+
+    if (_isRTL) {
+      for (var index = 0; index < alignmentXRanges.length; index++) {
+        final range = alignmentXRanges[index];
+
+        alignmentXRanges[index] = DoubleRange(
+          1 - range.endInclusive,
+          1 - range.start,
+        );
+      }
+    }
   }
 
   Alignment _animationValueToAlignment(double? value) {
@@ -391,7 +405,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
     final x = (positionFraction - 0.5 + halfTabWidthFraction) /
         (0.5 - halfTabWidthFraction);
 
-    return Alignment(x, 0);
+    return Alignment(_isRTL ? -x : x, 0);
   }
 
   TickerFuture _animateIndicatorTo(Alignment target) {
@@ -625,7 +639,9 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
   }
 
   int _alignmentToIndex(Alignment alignment) {
-    final currentPosition = _xToPercentsCoefficient(alignment);
+    final currentPosition = _isRTL
+        ? 1 - _xToPercentsCoefficient(alignment)
+        : _xToPercentsCoefficient(alignment);
     final roundedCurrentPosition =
         num.parse(currentPosition.toStringAsFixed(2));
 
