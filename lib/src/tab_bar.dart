@@ -459,6 +459,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                         selectedTextStyle: selectedTextStyle.copyWith(
                           color: tabTextColor,
                         ),
+                        fallbackColor: tabTextColor,
                         tabPadding: widget.tabPadding,
                       ),
                     ),
@@ -518,6 +519,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl>
                             selectedTextStyle: selectedTextStyle.copyWith(
                               color: selectedTabTextColor,
                             ),
+                            fallbackColor: selectedTabTextColor,
                             tabPadding: widget.tabPadding,
                           ),
                         ),
@@ -684,6 +686,7 @@ class _Labels extends StatelessWidget {
     required this.currentIndex,
     required this.textStyle,
     required this.selectedTextStyle,
+    required this.fallbackColor,
     this.radius,
     this.splashColor,
     this.splashHighlightColor,
@@ -695,6 +698,12 @@ class _Labels extends StatelessWidget {
   final int currentIndex;
   final TextStyle textStyle;
   final TextStyle selectedTextStyle;
+
+  /// Colour handed to [SegmentTab.labelBuilder] when the resolved style carries
+  /// none, which happens when the caller's [TextStyle] sets `foreground`:
+  /// [TextStyle.copyWith] drops the colour in that case.
+  final Color fallbackColor;
+
   final EdgeInsets tabPadding;
   final BorderRadiusGeometry? radius;
   final Color? splashColor;
@@ -712,6 +721,8 @@ class _Labels extends StatelessWidget {
           (index) {
             final tab = tabs[index];
 
+            final labelBuilder = tab.labelBuilder;
+
             final content = Padding(
               padding: tabPadding,
               child: Center(
@@ -720,12 +731,16 @@ class _Labels extends StatelessWidget {
                   curve: Curves.ease,
                   style:
                       (index == currentIndex) ? selectedTextStyle : textStyle,
-                  child: Text(
-                    tab.label,
-                    overflow: TextOverflow.clip,
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.clip,
+                  textAlign: TextAlign.center,
+                  child: labelBuilder == null
+                      ? Text(tab.label)
+                      : _CustomTabContent(
+                          semanticsLabel: tab.label,
+                          fallbackColor: fallbackColor,
+                          builder: labelBuilder,
+                        ),
                 ),
               ),
             );
@@ -744,6 +759,35 @@ class _Labels extends StatelessWidget {
                     ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+/// Renders [SegmentTab.labelBuilder] in the color of the label layer it is
+/// painted in.
+class _CustomTabContent extends StatelessWidget {
+  const _CustomTabContent({
+    required this.semanticsLabel,
+    required this.fallbackColor,
+    required this.builder,
+  });
+
+  final String semanticsLabel;
+  final Color fallbackColor;
+  final Widget Function(BuildContext context, Color color) builder;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = DefaultTextStyle.of(context).style.color ?? fallbackColor;
+
+    return Semantics(
+      label: semanticsLabel,
+      child: ExcludeSemantics(
+        child: IconTheme.merge(
+          data: IconThemeData(color: color),
+          child: builder(context, color),
         ),
       ),
     );

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class SegmentTab {
   const SegmentTab({
     required this.label,
+    this.labelBuilder,
     this.color,
     this.gradient,
     this.selectedTextColor,
@@ -17,7 +18,40 @@ class SegmentTab {
   });
 
   /// This text will be displayed on tab.
+  ///
+  /// Still required when [labelBuilder] is given, where it is used as the tab's
+  /// semantics label.
   final String label;
+
+  /// Builds the content of this tab, overriding [label].
+  ///
+  /// [color] is the resolved content color for the label layer currently being
+  /// painted — [SegmentedTabControl.tabTextColor] outside the indicator and
+  /// [SegmentedTabControl.selectedTabTextColor] inside it — already tweened for
+  /// the current frame. Plain [Icon] and [Text] descendants inherit it
+  /// automatically, so they inverse as the indicator passes over them without
+  /// any extra work:
+  ///
+  /// ```dart
+  /// SegmentTab(
+  ///   label: 'HOME',
+  ///   labelBuilder: (_, __) => const Row(
+  ///     mainAxisAlignment: MainAxisAlignment.center,
+  ///     children: [Icon(Icons.home, size: 18), SizedBox(width: 4), Text('HOME')],
+  ///   ),
+  /// )
+  /// ```
+  ///
+  /// Use [color] explicitly for anything that does not inherit it, such as a
+  /// [Container] border or an SVG.
+  ///
+  /// The builder must return the same layout for every [color].
+  ///
+  /// Content inherits `maxLines: 1`, [TextOverflow.clip] and
+  /// [TextAlign.center], matching the [label] path. Set [Text.maxLines]
+  /// explicitly to opt out. Nothing constrains a non-text child, so an
+  /// oversized one is clipped by the bar rather than resized.
+  final Widget Function(BuildContext context, Color color)? labelBuilder;
 
   /// Tab flex factor
   final int flex;

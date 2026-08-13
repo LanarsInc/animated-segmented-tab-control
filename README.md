@@ -105,6 +105,31 @@ or
 _controller.index
 ```
 
+## Сustom tab content
+
+Use `SegmentTab.labelBuilder` to show any widget like an icon.
+
+The selected-tab highlight is produced by painting the tab row twice and clipping the upper copy to the
+indicator, so the builder is called once per layer and receives the color of the layer it is painting.
+Plain `Icon` and `Text` children inherit that color. Use `color` for anything that does not inherit it, such as a 
+border or an SVG:
+
+```dart
+SegmentTab(
+  label: 'NEW',
+  labelBuilder: (context, color) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+    decoration: BoxDecoration(
+      border: Border.all(color: color),
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Text('NEW'),
+  ),
+)
+```
+
+Interactive children are not supported.
+
 ## Additional information
 
 If you have any ideas or are running into a bug, please submit an issue on github page: https://github.com/LanarsInc/animated-segmented-tab-control/issues

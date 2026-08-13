@@ -42,8 +42,17 @@ class MyApp extends StatelessWidget {
                         color: Colors.red.shade300,
                         backgroundColor: Colors.red.shade100,
                       ),
+                      // Custom content via [labelBuilder].
                       SegmentTab(
                         label: 'HOME',
+                        labelBuilder: (_, __) => const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.home, size: 18),
+                            SizedBox(width: 4),
+                            Text('HOME'),
+                          ],
+                        ),
                         backgroundColor: Colors.blue.shade100,
                         color: Colors.blue.shade300,
                       ),
