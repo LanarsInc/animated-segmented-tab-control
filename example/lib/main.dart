@@ -31,10 +31,8 @@ class MyApp extends StatelessWidget {
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
                     textStyle: textStyle,
                     selectedTextStyle: selectedTextStyle,
-                    barDecoration:
-                        BoxDecoration(borderRadius: BorderRadius.circular(10)),
-                    indicatorDecoration:
-                        BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                    barDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                    indicatorDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                     // Options for selection
                     tabs: [
                       SegmentTab(
