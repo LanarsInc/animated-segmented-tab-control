@@ -129,7 +129,6 @@ class SegmentedTabControl extends StatelessWidget {
 
 class _SegmentedTabControl extends StatefulWidget implements PreferredSizeWidget {
   const _SegmentedTabControl({
-    super.key,
     required this.height,
     required this.tabs,
     required this.maxWidth,
