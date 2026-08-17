@@ -31,17 +31,26 @@ class MyApp extends StatelessWidget {
                     tabPadding: const EdgeInsets.symmetric(horizontal: 8),
                     textStyle: textStyle,
                     selectedTextStyle: selectedTextStyle,
+                    barDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                    indicatorDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                     // Options for selection
-                    // All specified values will override the [SegmentedTabControl] setting
                     tabs: [
                       SegmentTab(
                         label: 'ACCOUNT',
-                        // For example, this overrides [indicatorColor] from [SegmentedTabControl]
                         color: Colors.red.shade300,
                         backgroundColor: Colors.red.shade100,
                       ),
+                      // Custom content via [labelBuilder].
                       SegmentTab(
                         label: 'HOME',
+                        labelBuilder: (_, __) => const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.home, size: 18),
+                            SizedBox(width: 4),
+                            Text('HOME'),
+                          ],
+                        ),
                         backgroundColor: Colors.blue.shade100,
                         color: Colors.blue.shade300,
                       ),
