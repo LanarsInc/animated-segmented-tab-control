@@ -1,12 +1,12 @@
 import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
                       // Custom content via [labelBuilder].
                       SegmentTab(
                         label: 'HOME',
-                        labelBuilder: (_, __) => const Row(
+                        labelBuilder: (_, _) => const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.home, size: 18),
@@ -94,10 +94,10 @@ class MyApp extends StatelessWidget {
 
 class SampleWidget extends StatelessWidget {
   const SampleWidget({
-    Key? key,
+    super.key,
     required this.label,
     required this.color,
-  }) : super(key: key);
+  });
 
   final String label;
   final Color color;

@@ -1,6 +1,6 @@
 import 'package:animated_segmented_tab_control/src/utils/double_range.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/physics.dart';
 
 import 'tab.dart';
@@ -272,22 +272,10 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
   }
 
   void _updateTabController() {
-    final TabController? newController = widget.controller ?? DefaultTabController.of(context);
-    assert(() {
-      if (newController == null) {
-        throw FlutterError(
-          'No TabController for ${widget.runtimeType}.\n'
-          'When creating a ${widget.runtimeType}, you must either provide an explicit '
-          'TabController using the "controller" property, or you must ensure that there '
-          'is a DefaultTabController above the ${widget.runtimeType}.\n'
-          'In this case, there was neither an explicit controller nor a default controller.',
-        );
-      }
-      return true;
-    }());
+    final TabController newController = widget.controller ?? DefaultTabController.of(context);
 
     assert(
-      newController == null || newController.length == widget.tabs.length,
+      newController.length == widget.tabs.length,
       'The number of tabs (${widget.tabs.length}) must match the length of the '
       'TabController (${newController.length}).',
     );
@@ -409,7 +397,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
 
     final selectedTabTextColor = currentTab.selectedTextColor ?? widget.selectedTabTextColor ?? Colors.white;
 
-    final tabTextColor = currentTab.textColor ?? widget.tabTextColor ?? Colors.white.withOpacity(0.7);
+    final tabTextColor = currentTab.textColor ?? widget.tabTextColor ?? Colors.white.withValues(alpha: 0.7);
 
     return DefaultTextStyle(
       style: widget.textStyle ?? DefaultTextStyle.of(context).style,
@@ -658,7 +646,6 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
 
 class _Labels extends StatelessWidget {
   const _Labels({
-    Key? key,
     this.callbackBuilder,
     required this.tabs,
     required this.currentIndex,
@@ -669,7 +656,7 @@ class _Labels extends StatelessWidget {
     this.splashColor,
     this.splashHighlightColor,
     this.tabPadding = const EdgeInsets.symmetric(horizontal: 8),
-  }) : super(key: key);
+  });
 
   final VoidCallback Function(int index)? callbackBuilder;
   final List<SegmentTab> tabs;
@@ -772,11 +759,10 @@ class _CustomTabContent extends StatelessWidget {
 
 class _SqueezeAnimated extends StatelessWidget {
   const _SqueezeAnimated({
-    Key? key,
     required this.builder,
     required this.currentTilePadding,
     this.squeezeDuration = const Duration(milliseconds: 500),
-  }) : super(key: key);
+  });
 
   final Widget Function(EdgeInsets) builder;
   final EdgeInsets currentTilePadding;

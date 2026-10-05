@@ -1,3 +1,10 @@
+# Changelog
+
+## 3.0.0
+
+* Feature: Migrates to `material_ui`.
+* Feature: Updates minimum supported SDK version to Flutter 3.44/Dart 3.12.
+
 ## 2.1.0
 * Enhancement: Add `SegmentTab.labelBuilder` to display custom tab content, such as an icon
   ([#32](https://github.com/LanarsInc/animated-segmented-tab-control/issues/32)), based on the approach
