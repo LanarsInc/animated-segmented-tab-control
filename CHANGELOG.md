@@ -1,3 +1,12 @@
+## 3.0.0
+* **Breaking changes**
+    * Migrate from `package:flutter/material.dart` to `material_ui`.
+      `TabController` and `DefaultTabController` must now come from `package:material_ui/material_ui.dart`;
+      the ones from `package:flutter/material.dart` are different classes and are no longer found.
+    * Require Flutter 3.44 and Dart 3.12, the minimum supported by `material_ui`
+* Fix the dragged indicator moving faster or slower than the finger unless there are exactly three tabs of equal flex
+* Replace deprecated `Color.withOpacity` with `Color.withValues`
+
 ## 2.1.0
 * Enhancement: Add `SegmentTab.labelBuilder` to display custom tab content, such as an icon
   ([#32](https://github.com/LanarsInc/animated-segmented-tab-control/issues/32)), based on the approach

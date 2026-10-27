@@ -1,6 +1,6 @@
 import 'package:animated_segmented_tab_control/src/utils/double_range.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/physics.dart';
 
 import 'tab.dart';
@@ -26,10 +26,7 @@ class SegmentedTabControl extends StatelessWidget {
     this.tabPadding = const EdgeInsets.symmetric(horizontal: 8),
     this.splashColor,
     this.splashHighlightColor,
-    this.barDecoration = const BoxDecoration(
-      color: Colors.grey,
-      borderRadius: BorderRadius.all(Radius.circular(10)),
-    ),
+    this.barDecoration = const BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.all(Radius.circular(10))),
     this.indicatorDecoration = const BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -272,22 +269,10 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
   }
 
   void _updateTabController() {
-    final TabController? newController = widget.controller ?? DefaultTabController.of(context);
-    assert(() {
-      if (newController == null) {
-        throw FlutterError(
-          'No TabController for ${widget.runtimeType}.\n'
-          'When creating a ${widget.runtimeType}, you must either provide an explicit '
-          'TabController using the "controller" property, or you must ensure that there '
-          'is a DefaultTabController above the ${widget.runtimeType}.\n'
-          'In this case, there was neither an explicit controller nor a default controller.',
-        );
-      }
-      return true;
-    }());
+    final TabController newController = widget.controller ?? DefaultTabController.of(context);
 
     assert(
-      newController == null || newController.length == widget.tabs.length,
+      newController.length == widget.tabs.length,
       'The number of tabs (${widget.tabs.length}) must match the length of the '
       'TabController (${newController.length}).',
     );
@@ -346,10 +331,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
       for (var index = 0; index < alignmentXRanges.length; index++) {
         final range = alignmentXRanges[index];
 
-        alignmentXRanges[index] = DoubleRange(
-          1 - range.endInclusive,
-          1 - range.start,
-        );
+        alignmentXRanges[index] = DoubleRange(1 - range.endInclusive, 1 - range.start);
       }
     }
   }
@@ -391,10 +373,9 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
   }
 
   TickerFuture _animateIndicatorTo(Alignment target) {
-    _internalAnimation = _internalAnimationController.drive(AlignmentTween(
-      begin: _currentIndicatorAlignment,
-      end: target,
-    ));
+    _internalAnimation = _internalAnimationController.drive(
+      AlignmentTween(begin: _currentIndicatorAlignment, end: target),
+    );
 
     return _internalAnimationController.fling();
   }
@@ -409,7 +390,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
 
     final selectedTabTextColor = currentTab.selectedTextColor ?? widget.selectedTabTextColor ?? Colors.white;
 
-    final tabTextColor = currentTab.textColor ?? widget.tabTextColor ?? Colors.white.withOpacity(0.7);
+    final tabTextColor = currentTab.textColor ?? widget.tabTextColor ?? Colors.white.withValues(alpha: 0.7);
 
     return DefaultTextStyle(
       style: widget.textStyle ?? DefaultTextStyle.of(context).style,
@@ -441,12 +422,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
                         callbackBuilder: _onTabTap(),
                         tabs: widget.tabs,
                         currentIndex: _internalIndex,
-                        textStyle: textStyle.copyWith(
-                          color: tabTextColor,
-                        ),
-                        selectedTextStyle: selectedTextStyle.copyWith(
-                          color: tabTextColor,
-                        ),
+                        textStyle: textStyle.copyWith(color: tabTextColor),
+                        selectedTextStyle: selectedTextStyle.copyWith(color: tabTextColor),
                         fallbackColor: tabTextColor,
                         tabPadding: widget.tabPadding,
                       ),
@@ -456,7 +433,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
                     alignment: _currentIndicatorAlignment,
                     child: GestureDetector(
                       onPanDown: _onPanDown(),
-                      onPanUpdate: _onPanUpdate(widget.maxWidth),
+                      onPanUpdate: _onPanUpdate(widget.maxWidth - indicatorWidth - widget.indicatorPadding.horizontal),
                       onPanEnd: _onPanEnd(widget.maxWidth),
                       child: Padding(
                         padding: widget.indicatorPadding,
@@ -497,12 +474,8 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
                           child: _Labels(
                             tabs: widget.tabs,
                             currentIndex: _internalIndex,
-                            textStyle: textStyle.copyWith(
-                              color: selectedTabTextColor,
-                            ),
-                            selectedTextStyle: selectedTextStyle.copyWith(
-                              color: selectedTabTextColor,
-                            ),
+                            textStyle: textStyle.copyWith(color: selectedTabTextColor),
+                            selectedTextStyle: selectedTextStyle.copyWith(color: selectedTabTextColor),
                             fallbackColor: selectedTabTextColor,
                             tabPadding: widget.tabPadding,
                           ),
@@ -523,11 +496,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
   ///
   /// Colour and gradient are resolved as a *pair*: if the tab specifies either
   /// one, it replaces both.
-  BoxDecoration? _resolveBackground(
-    BoxDecoration? base,
-    Color? tabColor,
-    Gradient? tabGradient,
-  ) {
+  BoxDecoration? _resolveBackground(BoxDecoration? base, Color? tabColor, Gradient? tabGradient) {
     if (tabColor == null && tabGradient == null) return base;
 
     final baseGradient = base?.gradient;
@@ -571,9 +540,9 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
       return null;
     }
     return (int index) => () {
-          _internalAnimationController.stop();
-          _controller!.animateTo(index);
-        };
+      _internalAnimationController.stop();
+      _controller!.animateTo(index);
+    };
   }
 
   GestureDragDownCallback? _onPanDown() {
@@ -588,12 +557,12 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
     };
   }
 
-  GestureDragUpdateCallback? _onPanUpdate(double maxWidth) {
-    if (_controller!.indexIsChanging) {
+  GestureDragUpdateCallback? _onPanUpdate(double travelWidth) {
+    if (_controller!.indexIsChanging || travelWidth <= 0) {
       return null;
     }
     return (details) {
-      double x = _currentIndicatorAlignment.x + details.delta.dx / (maxWidth / widget.tabs.length);
+      double x = _currentIndicatorAlignment.x + details.delta.dx * 2 / travelWidth;
       if (x < -1) {
         x = -1;
       } else if (x > 1) {
@@ -622,10 +591,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
 
   GestureDragEndCallback _onPanEnd(double maxWidth) {
     return (details) {
-      _animateIndicatorToNearest(
-        details.velocity.pixelsPerSecond,
-        maxWidth,
-      );
+      _animateIndicatorToNearest(details.velocity.pixelsPerSecond, maxWidth);
       _updateControllerIndex();
       setState(() {
         _currentTilePadding = EdgeInsets.zero;
@@ -636,10 +602,9 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
   TickerFuture _animateIndicatorToNearest(Offset pixelsPerSecond, double width) {
     final nearest = _internalIndex;
     final target = _animationValueToAlignment(nearest.toDouble());
-    _internalAnimation = _internalAnimationController.drive(AlignmentTween(
-      begin: _currentIndicatorAlignment,
-      end: target,
-    ));
+    _internalAnimation = _internalAnimationController.drive(
+      AlignmentTween(begin: _currentIndicatorAlignment, end: target),
+    );
     final unitsPerSecondX = pixelsPerSecond.dx / width;
     final unitsPerSecond = Offset(unitsPerSecondX, 0);
     final unitVelocity = unitsPerSecond.distance;
@@ -658,7 +623,6 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
 
 class _Labels extends StatelessWidget {
   const _Labels({
-    Key? key,
     this.callbackBuilder,
     required this.tabs,
     required this.currentIndex,
@@ -669,7 +633,7 @@ class _Labels extends StatelessWidget {
     this.splashColor,
     this.splashHighlightColor,
     this.tabPadding = const EdgeInsets.symmetric(horizontal: 8),
-  }) : super(key: key);
+  });
 
   final VoidCallback Function(int index)? callbackBuilder;
   final List<SegmentTab> tabs;
@@ -694,48 +658,41 @@ class _Labels extends StatelessWidget {
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(
-          tabs.length,
-          (index) {
-            final tab = tabs[index];
+        children: List.generate(tabs.length, (index) {
+          final tab = tabs[index];
 
-            final labelBuilder = tab.labelBuilder;
+          final labelBuilder = tab.labelBuilder;
 
-            final content = Padding(
-              padding: tabPadding,
-              child: Center(
-                child: AnimatedDefaultTextStyle(
-                  duration: kTabScrollDuration,
-                  curve: Curves.ease,
-                  style: (index == currentIndex) ? selectedTextStyle : textStyle,
-                  maxLines: 1,
-                  overflow: TextOverflow.clip,
-                  textAlign: TextAlign.center,
-                  child: labelBuilder == null
-                      ? Text(tab.label)
-                      : _CustomTabContent(
-                          semanticsLabel: tab.label,
-                          fallbackColor: fallbackColor,
-                          builder: labelBuilder,
-                        ),
-                ),
+          final content = Padding(
+            padding: tabPadding,
+            child: Center(
+              child: AnimatedDefaultTextStyle(
+                duration: kTabScrollDuration,
+                curve: Curves.ease,
+                style: (index == currentIndex) ? selectedTextStyle : textStyle,
+                maxLines: 1,
+                overflow: TextOverflow.clip,
+                textAlign: TextAlign.center,
+                child: labelBuilder == null
+                    ? Text(tab.label)
+                    : _CustomTabContent(semanticsLabel: tab.label, fallbackColor: fallbackColor, builder: labelBuilder),
               ),
-            );
+            ),
+          );
 
-            return Flexible(
-              flex: tab.flex,
-              child: callbackBuilder == null
-                  ? content
-                  : InkWell(
-                      splashColor: tab.splashColor ?? splashColor,
-                      highlightColor: tab.splashHighlightColor ?? splashHighlightColor,
-                      borderRadius: radius as BorderRadius?,
-                      onTap: callbackBuilder(index),
-                      child: content,
-                    ),
-            );
-          },
-        ),
+          return Flexible(
+            flex: tab.flex,
+            child: callbackBuilder == null
+                ? content
+                : InkWell(
+                    splashColor: tab.splashColor ?? splashColor,
+                    highlightColor: tab.splashHighlightColor ?? splashHighlightColor,
+                    borderRadius: radius as BorderRadius?,
+                    onTap: callbackBuilder(index),
+                    child: content,
+                  ),
+          );
+        }),
       ),
     );
   }
@@ -744,11 +701,7 @@ class _Labels extends StatelessWidget {
 /// Renders [SegmentTab.labelBuilder] in the color of the label layer it is
 /// painted in.
 class _CustomTabContent extends StatelessWidget {
-  const _CustomTabContent({
-    required this.semanticsLabel,
-    required this.fallbackColor,
-    required this.builder,
-  });
+  const _CustomTabContent({required this.semanticsLabel, required this.fallbackColor, required this.builder});
 
   final String semanticsLabel;
   final Color fallbackColor;
@@ -772,11 +725,10 @@ class _CustomTabContent extends StatelessWidget {
 
 class _SqueezeAnimated extends StatelessWidget {
   const _SqueezeAnimated({
-    Key? key,
     required this.builder,
     required this.currentTilePadding,
     this.squeezeDuration = const Duration(milliseconds: 500),
-  }) : super(key: key);
+  });
 
   final Widget Function(EdgeInsets) builder;
   final EdgeInsets currentTilePadding;
@@ -786,15 +738,9 @@ class _SqueezeAnimated extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<EdgeInsets>(
       curve: Curves.decelerate,
-      tween: Tween(
-        begin: EdgeInsets.zero,
-        end: currentTilePadding,
-      ),
+      tween: Tween(begin: EdgeInsets.zero, end: currentTilePadding),
       duration: squeezeDuration,
-      builder: (context, padding, _) => Padding(
-        padding: padding,
-        child: builder.call(padding),
-      ),
+      builder: (context, padding, _) => Padding(padding: padding, child: builder.call(padding)),
     );
   }
 }
