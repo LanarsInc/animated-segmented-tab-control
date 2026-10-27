@@ -28,12 +28,12 @@ The package provides an advanced segmented control widget based on the `TabContr
 
 ## Requirements
 
-Since 3.0.0 the package is built on [`material_ui`](https://pub.dev/packages/material_ui) instead of
+Since 2.2.0 the package is built on [`material_ui`](https://pub.dev/packages/material_ui) instead of
 `package:flutter/material.dart` and requires Flutter 3.44 or later. Create the `TabController` or
 `DefaultTabController` used with `SegmentedTabControl` from `package:material_ui/material_ui.dart`: the
 controllers from `package:flutter/material.dart` are different classes and are not found by the widget.
 
-If your app still imports `package:flutter/material.dart`, keep using 2.x until you migrate.
+If your app still imports `package:flutter/material.dart`, keep using 2.1.0 until you migrate.
 
 ## Usage
 
