@@ -1,3 +1,7 @@
+## Unreleased
+* Fix the dragged indicator moving faster or slower than the finger unless there are exactly three tabs of equal flex
+* Replace deprecated `Color.withOpacity` with `Color.withValues`
+
 ## 2.1.0
 * Enhancement: Add `SegmentTab.labelBuilder` to display custom tab content, such as an icon
   ([#32](https://github.com/LanarsInc/animated-segmented-tab-control/issues/32)), based on the approach

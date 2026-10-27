@@ -409,7 +409,7 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
 
     final selectedTabTextColor = currentTab.selectedTextColor ?? widget.selectedTabTextColor ?? Colors.white;
 
-    final tabTextColor = currentTab.textColor ?? widget.tabTextColor ?? Colors.white.withOpacity(0.7);
+    final tabTextColor = currentTab.textColor ?? widget.tabTextColor ?? Colors.white.withValues(alpha: 0.7);
 
     return DefaultTextStyle(
       style: widget.textStyle ?? DefaultTextStyle.of(context).style,
@@ -456,7 +456,9 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
                     alignment: _currentIndicatorAlignment,
                     child: GestureDetector(
                       onPanDown: _onPanDown(),
-                      onPanUpdate: _onPanUpdate(widget.maxWidth),
+                      onPanUpdate: _onPanUpdate(
+                        widget.maxWidth - indicatorWidth - widget.indicatorPadding.horizontal,
+                      ),
                       onPanEnd: _onPanEnd(widget.maxWidth),
                       child: Padding(
                         padding: widget.indicatorPadding,
@@ -588,12 +590,12 @@ class _SegmentedTabControlState extends State<_SegmentedTabControl> with SingleT
     };
   }
 
-  GestureDragUpdateCallback? _onPanUpdate(double maxWidth) {
-    if (_controller!.indexIsChanging) {
+  GestureDragUpdateCallback? _onPanUpdate(double travelWidth) {
+    if (_controller!.indexIsChanging || travelWidth <= 0) {
       return null;
     }
     return (details) {
-      double x = _currentIndicatorAlignment.x + details.delta.dx / (maxWidth / widget.tabs.length);
+      double x = _currentIndicatorAlignment.x + details.delta.dx * 2 / travelWidth;
       if (x < -1) {
         x = -1;
       } else if (x > 1) {
