@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Selection option for [SegmentedTabControl]
 @immutable
@@ -35,7 +35,7 @@ class SegmentTab {
   /// ```dart
   /// SegmentTab(
   ///   label: 'HOME',
-  ///   labelBuilder: (_, __) => const Row(
+  ///   labelBuilder: (_, _) => const Row(
   ///     mainAxisAlignment: MainAxisAlignment.center,
   ///     children: [Icon(Icons.home, size: 18), SizedBox(width: 4), Text('HOME')],
   ///   ),
@@ -121,15 +121,15 @@ class SegmentTab {
 
   @override
   int get hashCode => Object.hash(
-        label,
-        flex,
-        color,
-        gradient,
-        selectedTextColor,
-        backgroundColor,
-        backgroundGradient,
-        textColor,
-        splashColor,
-        splashHighlightColor,
-      );
+    label,
+    flex,
+    color,
+    gradient,
+    selectedTextColor,
+    backgroundColor,
+    backgroundGradient,
+    textColor,
+    splashColor,
+    splashHighlightColor,
+  );
 }

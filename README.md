@@ -26,6 +26,15 @@ The package provides an advanced segmented control widget based on the `TabContr
 <img src="https://raw.githubusercontent.com/LanarsInc/animated-segmented-tab-control/main/example/assets/neumorphic_example.gif" width="356">
 <img src="https://raw.githubusercontent.com/LanarsInc/animated-segmented-tab-control/main/example/assets/flexible_tabs_example.jpg" width="356">
 
+## Requirements
+
+Since 3.0.0 the package is built on [`material_ui`](https://pub.dev/packages/material_ui) instead of
+`package:flutter/material.dart` and requires Flutter 3.44 or later. Create the `TabController` or
+`DefaultTabController` used with `SegmentedTabControl` from `package:material_ui/material_ui.dart`: the
+controllers from `package:flutter/material.dart` are different classes and are not found by the widget.
+
+If your app still imports `package:flutter/material.dart`, keep using 2.x until you migrate.
+
 ## Usage
 
 The package contains a `SegmentedTabControl` widget that requires a `SegmentTab` list.
