@@ -1,3 +1,12 @@
+## 2.2.0
+* Enhancement: Migrate from `package:flutter/material.dart` to [material_ui](https://pub.dev/packages/material_ui).
+  Use `TabController` and `DefaultTabController` from `package:material_ui/material_ui.dart` with the widget
+* Enhancement: Update the minimum supported versions to Flutter 3.44 and Dart 3.12, as required by `material_ui`
+* Fix the dragged indicator moving faster or slower than the finger unless there are exactly three tabs
+  of equal flex
+* Fix static analysis issues reported by pub.dev
+* Update the example to Gradle 9.3.1, Android Gradle Plugin 9.1.0 and Kotlin 2.4.0
+
 ## 2.1.0
 * Enhancement: Add `SegmentTab.labelBuilder` to display custom tab content, such as an icon
   ([#32](https://github.com/LanarsInc/animated-segmented-tab-control/issues/32)), based on the approach

@@ -1,12 +1,12 @@
 import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,30 +35,18 @@ class MyApp extends StatelessWidget {
                     indicatorDecoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                     // Options for selection
                     tabs: [
-                      SegmentTab(
-                        label: 'ACCOUNT',
-                        color: Colors.red.shade300,
-                        backgroundColor: Colors.red.shade100,
-                      ),
+                      SegmentTab(label: 'ACCOUNT', color: Colors.red.shade300, backgroundColor: Colors.red.shade100),
                       // Custom content via [labelBuilder].
                       SegmentTab(
                         label: 'HOME',
-                        labelBuilder: (_, __) => const Row(
+                        labelBuilder: (_, _) => const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.home, size: 18),
-                            SizedBox(width: 4),
-                            Text('HOME'),
-                          ],
+                          children: [Icon(Icons.home, size: 18), SizedBox(width: 4), Text('HOME')],
                         ),
                         backgroundColor: Colors.blue.shade100,
                         color: Colors.blue.shade300,
                       ),
-                      SegmentTab(
-                        label: 'NEW',
-                        backgroundColor: Colors.orange.shade100,
-                        color: Colors.orange.shade300,
-                      ),
+                      SegmentTab(label: 'NEW', backgroundColor: Colors.orange.shade100, color: Colors.orange.shade300),
                     ],
                   ),
                 ),
@@ -68,18 +56,9 @@ class MyApp extends StatelessWidget {
                   child: TabBarView(
                     physics: const BouncingScrollPhysics(),
                     children: [
-                      SampleWidget(
-                        label: 'FIRST PAGE',
-                        color: Colors.red.shade100,
-                      ),
-                      SampleWidget(
-                        label: 'SECOND PAGE',
-                        color: Colors.blue.shade100,
-                      ),
-                      SampleWidget(
-                        label: 'THIRD PAGE',
-                        color: Colors.orange.shade100,
-                      ),
+                      SampleWidget(label: 'FIRST PAGE', color: Colors.red.shade100),
+                      SampleWidget(label: 'SECOND PAGE', color: Colors.blue.shade100),
+                      SampleWidget(label: 'THIRD PAGE', color: Colors.orange.shade100),
                     ],
                   ),
                 ),
@@ -93,11 +72,7 @@ class MyApp extends StatelessWidget {
 }
 
 class SampleWidget extends StatelessWidget {
-  const SampleWidget({
-    Key? key,
-    required this.label,
-    required this.color,
-  }) : super(key: key);
+  const SampleWidget({super.key, required this.label, required this.color});
 
   final String label;
   final Color color;
